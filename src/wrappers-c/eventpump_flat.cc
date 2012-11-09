@@ -30,18 +30,18 @@
 #include "../lw_common.h"
 
 lw_pump * lw_eventpump_new ()
-    { return (lw_pump *) new EventPump;
+    { return (lw_pump) new EventPump;
     }
-void lw_eventpump_tick (lw_pump * eventpump)
+void lw_eventpump_tick (lw_pump eventpump)
     { ((EventPump *) eventpump)->Tick ();
     }
-void lw_eventpump_start_event_loop (lw_pump * eventpump)
+void lw_eventpump_start_event_loop (lw_pump eventpump)
     { ((EventPump *) eventpump)->StartEventLoop ();
     }
-void lw_eventpump_start_sleepy_ticking (lw_pump * eventpump, void (LacewingHandler * on_tick_needed) (lw_pump *))
+void lw_eventpump_start_sleepy_ticking (lw_pump eventpump, void (LacewingHandler * on_tick_needed) (lw_pump *))
     { ((EventPump *) eventpump)->StartSleepyTicking ((void (LacewingHandler *) (EventPump &)) on_tick_needed);
     }
-void lw_eventpump_post_eventloop_exit (lw_pump * eventpump)
+void lw_eventpump_post_eventloop_exit (lw_pump eventpump)
     { ((EventPump *) eventpump)->PostEventLoopExit ();
     }
 

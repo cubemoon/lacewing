@@ -1,7 +1,7 @@
 
 /* vim: set et ts=4 sw=4 ft=cpp:
  *
- * Copyright (C) 2011, 2012 James McLaughlin.  All rights reserved.
+ * Copyright (C) 2012 James McLaughlin.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,39 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
-
-lw_stream lw_client_new (lw_pump pump)
-    { return (lw_stream) new Client (*(Pump *) pump);
+Stream * Stream::New ()
+    { return (Stream *) lw_stream_new ();
     }
-void lw_client_delete (lw_stream client)
-    { delete (Client *) client;
-    }
-void lw_client_connect (lw_stream client, const char * host, long port)
-    { ((Client *) client)->Connect (host, port);
-    }
-void lw_client_connect_addr (lw_stream client, lw_addr * address)
-    { ((Client *) client)->Connect (*(Address *) address);
-    }
-void lw_client_close (lw_stream client)
-    { ((Client *) client)->Close ();
-    }
-lw_bool lw_client_connected (lw_stream client)
-    { return ((Client *) client)->Connected ();
-    }
-lw_bool lw_client_connecting (lw_stream client)
-    { return ((Client *) client)->Connecting ();
-    }
-lw_addr * lw_client_server_addr (lw_stream client)
-    { return (lw_addr) &((Client *) client)->ServerAddress ();
-    }
-
-AutoHandlerFlat (Client, lw_stream, lw_client, Connect, connect)
-AutoHandlerFlat (Client, lw_stream, lw_client, Disconnect, disconnect)
-AutoHandlerFlat (Client, lw_stream, lw_client, Receive, receive)
-AutoHandlerFlat (Client, lw_stream, lw_client, Error, error)
-
-
-
-
 

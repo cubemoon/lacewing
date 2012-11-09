@@ -1,5 +1,5 @@
 AC_PREREQ([2.49])
-AC_INIT([liblacewing], [0.4.3], [])
+AC_INIT([liblacewing], [0.5.0], [])
 
 AC_PROG_CXX
 
@@ -57,15 +57,15 @@ fi
 
 if test "x$EXEEXT" = "x.exe"; then
 
-    OBJECTS="$OBJECTS build/windows-Client.o build/windows-lw_compat.o \
-             build/windows-Event.o build/windows-EventPump.o \
-             build/windows-Server.o build/windows-Thread.o \
-             build/windows-Timer.o build/windows-UDP.o \
-             build/windows-FDStream.o build/windows-File.o \
-             build/windows-WinSSLClient.o build/windows-Sync.o \
-             build/windows-lw_global.o"
+    OBJECTS="$OBJECTS build/windows-client.o build/windows-compat.o \
+             build/windows-event.o build/windows-eventpump.o \
+             build/windows-server.o build/windows-thread.o \
+             build/windows-timer.o build/windows-udp.o \
+             build/windows-fdstream.o build/windows-file.o \
+             build/windows-winsslclient.o build/windows-sync.o \
+             build/windows-global.o"
 
-    COMMONDEPS="$COMMONDEPS src/windows/lw_compat.h src/windows/lw_common.h"
+    COMMONDEPS="$COMMONDEPS src/windows/compat.h src/windows/common.h"
 
     SO_EXT="dll"
     LIBS="$LIBS -lmswsock -lws2_32 -lcrypt32 -lsecur32"
@@ -74,12 +74,12 @@ else
 
 	CFLAGS="$CFLAGS -fPIC"
 
-	OBJECTS="$OBJECTS build/unix-Client.o build/unix-Event.o build/unix-EventPump.o \
-        build/unix-Server.o build/unix-Thread.o build/unix-Timer.o build/unix-UDP.o \
-        build/unix-FDStream.o build/unix-File.o build/openssl-SSLClient.o \
-        build/unix-Sync.o build/unix-lw_global.o"
+	OBJECTS="$OBJECTS build/unix-client.o build/unix-event.o build/unix-eventpump.o \
+        build/unix-server.o build/unix-thread.o build/unix-timer.o build/unix-udp.o \
+        build/unix-fdstream.o build/unix-file.o build/openssl-sslclient.o \
+        build/unix-sync.o build/unix-global.o"
 
-	COMMONDEPS="$COMMONDEPS src/unix/EventPump.h src/unix/lw_common.h"
+	COMMONDEPS="$COMMONDEPS src/unix/eventpump.h src/unix/common.h"
 
 	AC_CHECK_HEADERS([malloc.h sys/epoll.h sys/prctl.h sys/sendfile.h \
 						  netdb.h openssl/md5.h sys/timerfd.h])
@@ -114,7 +114,7 @@ CFLAGS="-ansi -Wall -Wno-format $CFLAGS"
 AC_SUBST(OBJECTS, $OBJECTS)
 AC_SUBST(COMMONDEPS, $COMMONDEPS)
 
-SO_NAME=liblacewing.$SO_EXT.0.4
+SO_NAME=liblacewing.$SO_EXT.0.5
 
 AC_SUBST(SO_NAME, $SO_NAME)
 AC_SUBST(SO_EXT, $SO_EXT)

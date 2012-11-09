@@ -1,7 +1,7 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
- * Copyright (C) 2011, 2012 James McLaughlin.  All rights reserved.
+ * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,39 +27,46 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "lw_list.h"
 
-lw_stream lw_client_new (lw_pump pump)
-    { return (lw_stream) new Client (*(Pump *) pump);
-    }
-void lw_client_delete (lw_stream client)
-    { delete (Client *) client;
-    }
-void lw_client_connect (lw_stream client, const char * host, long port)
-    { ((Client *) client)->Connect (host, port);
-    }
-void lw_client_connect_addr (lw_stream client, lw_addr * address)
-    { ((Client *) client)->Connect (*(Address *) address);
-    }
-void lw_client_close (lw_stream client)
-    { ((Client *) client)->Close ();
-    }
-lw_bool lw_client_connected (lw_stream client)
-    { return ((Client *) client)->Connected ();
-    }
-lw_bool lw_client_connecting (lw_stream client)
-    { return ((Client *) client)->Connecting ();
-    }
-lw_addr * lw_client_server_addr (lw_stream client)
-    { return (lw_addr) &((Client *) client)->ServerAddress ();
-    }
+struct
+{
+    struct lwp_list_element * first, * last;
+    size_t size;
 
-AutoHandlerFlat (Client, lw_stream, lw_client, Connect, connect)
-AutoHandlerFlat (Client, lw_stream, lw_client, Disconnect, disconnect)
-AutoHandlerFlat (Client, lw_stream, lw_client, Receive, receive)
-AutoHandlerFlat (Client, lw_stream, lw_client, Error, error)
+} lwp_list_head;
 
+struct
+{
+    lwp_list_element * prev, next;
+    char value [1];
 
+} lwp_list_element;
 
+void _lwp_list_push (void ** list, size_t value_size, void * value)
+{
+    struct lwp_list_head * head;
+    struct lwp_list_element * element;
+
+    if (!*list)
+        *list = head = calloc (sizeof (*head), 1);
+
+    ++ head->size;
+
+    element = calloc (sizeof (*element) + value_size - 1, 1);
+    memcpy (element->value, value_size, value);
+
+    element->prev = head->last;
+
+    if (head->last)
+    {
+        head->last->next = element;
+        head->last = element;
+    }
+    else
+    {
+        head->first = head->last = element;
+    }
+}
 
 

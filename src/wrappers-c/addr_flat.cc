@@ -29,40 +29,40 @@
 
 #include "../lw_common.h"
 
-lw_addr * lw_addr_new (const char * hostname, const char * service)
-    { return (lw_addr *) new Address (hostname, service);
+lw_addr lw_addr_new (const char * hostname, const char * service)
+    { return (lw_addr) new Address (hostname, service);
     }
-lw_addr * lw_addr_new_port (const char * hostname, long port)
-    { return (lw_addr *) new Address (hostname, port);
+lw_addr lw_addr_new_port (const char * hostname, long port)
+    { return (lw_addr) new Address (hostname, port);
     }
-lw_addr * lw_addr_new_ex (const char * hostname, const char * service, long hints)
-    { return (lw_addr *) new Address (hostname, service, hints);
+lw_addr lw_addr_new_ex (const char * hostname, const char * service, long hints)
+    { return (lw_addr) new Address (hostname, service, hints);
     }
-lw_addr * lw_addr_new_port_ex (const char * hostname, long port, long hints)
-    { return (lw_addr *) new Address (hostname, port, hints);
+lw_addr lw_addr_new_port_ex (const char * hostname, long port, long hints)
+    { return (lw_addr) new Address (hostname, port, hints);
     }
-lw_addr * lw_addr_copy (lw_addr * address)
-    { return (lw_addr *) new Address (*(Address *) address);
+lw_addr lw_addr_copy (lw_addr address)
+    { return (lw_addr) new Address (*(Address *) address);
     }
-void lw_addr_delete (lw_addr * address)
+void lw_addr_delete (lw_addr address)
     { delete (Address *) address;
     }
-long lw_addr_port (lw_addr * address)
+long lw_addr_port (lw_addr address)
     { return ((Address *) address)->Port ();
     }
-void lw_addr_set_port (lw_addr * address, long port)
+void lw_addr_set_port (lw_addr address, long port)
     { ((Address *) address)->Port (port);
     }
-lw_bool lw_addr_is_ready (lw_addr * address)
+lw_bool lw_addr_is_ready (lw_addr address)
     { return ((Address *) address)->Ready ();
     }
-lw_bool lw_addr_is_ipv6 (lw_addr * address)
+lw_bool lw_addr_is_ipv6 (lw_addr address)
     { return ((Address *) address)->IPv6 ();
     }
-lw_bool lw_addr_is_equal (lw_addr * address_a, lw_addr * address_b)
+lw_bool lw_addr_is_equal (lw_addr address_a, lw_addr address_b)
     { return (*(Address *) address_a) == (*(Address *) address_b);
     }
-const char * lw_addr_to_string (lw_addr * address)
+const char * lw_addr_to_string (lw_addr address)
     { return ((Address *) address)->ToString ();
     }
 

@@ -27,19 +27,19 @@
  * SUCH DAMAGE.
  */
 
-#include "lw_common.h"
+#include "common.h"
 
-void lw_nvhash_set (lw_nvhash ** hash, const char * key, const char * value,
+void lw_nvhash_set (lw_nvhash * hash, const char * key, const char * value,
                     lw_bool copy)
 {
    lw_nvhash_set_ex (hash, strlen (key), key, strlen (value), value, copy);
 }
 
-void lw_nvhash_set_ex (lw_nvhash ** hash, size_t key_len, const char * key,
+void lw_nvhash_set_ex (lw_nvhash * hash, size_t key_len, const char * key,
                        size_t value_len, const char * value,
                        lw_bool copy)
 {
-   lw_nvhash * item;
+   lw_nvhash item;
 
    HASH_FIND (hh, *hash, key, key_len, item);
 
@@ -61,7 +61,7 @@ void lw_nvhash_set_ex (lw_nvhash ** hash, size_t key_len, const char * key,
       return;
    }
 
-   item = (lw_nvhash *) malloc (sizeof (lw_nvhash));
+   item = (lw_nvhash) malloc (sizeof (lw_nvhash));
 
    if (copy)
    {
@@ -82,10 +82,10 @@ void lw_nvhash_set_ex (lw_nvhash ** hash, size_t key_len, const char * key,
    HASH_ADD_KEYPTR (hh, *hash, item->key, key_len, item);
 }
 
-const char * lw_nvhash_get (lw_nvhash ** hash, const char * key,
+const char * lw_nvhash_get (lw_nvhash * hash, const char * key,
                             const char * def)
 {
-   lw_nvhash * item;
+   lw_nvhash item;
 
    HASH_FIND (hh, *hash, key, strlen (key), item);
 
@@ -95,9 +95,9 @@ const char * lw_nvhash_get (lw_nvhash ** hash, const char * key,
    return def;
 }
 
-void lw_nvhash_clear (lw_nvhash ** hash)
+void lw_nvhash_clear (lw_nvhash * hash)
 {
-   lw_nvhash * tail, * item, * tmp;
+   lw_nvhash tail, item, tmp;
 
    HASH_ITER (hh, *hash, item, tmp)
    {
@@ -111,7 +111,7 @@ void lw_nvhash_clear (lw_nvhash ** hash)
 
    while (*hash)
    {
-      tail = (lw_nvhash *) (*hash)->hh.tbl->tail;
+      tail = (lw_nvhash) (*hash)->hh.tbl->tail;
 
       HASH_DEL (*hash, tail);
 

@@ -1,7 +1,7 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
- * Copyright (C) 2012 James McLaughlin.  All rights reserved.
+ * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,12 +27,28 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#ifndef _lw_nvhash_h
+#define _lw_nvhash_h
 
-lw_stream * lw_pipe_new ()
-    { return (lw_stream *) new Pipe ();
-    }
-lw_stream * lw_pipe_new_pump (lw_pump * pump)
-    { return (lw_stream *) new Pipe (*(Pump *) pump);
-    }
+typedef struct _lw_nvhash
+{
+   char * key;
+   char * value;
+
+   UT_hash_handle hh;
+
+} * lw_nvhash;
+
+void lw_nvhash_set (lw_nvhash *, const char * key, const char * value,
+                    lw_bool copy);
+
+void lw_nvhash_set_ex (lw_nvhash *, size_t key_len, const char * key,
+                       size_t value_len, const char * value, lw_bool copy);
+
+const char * lw_nvhash_get (lw_nvhash *, const char * key, const char * def);
+
+void lw_nvhash_clear (lw_nvhash *);
+
+#endif
+
 

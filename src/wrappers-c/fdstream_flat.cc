@@ -29,22 +29,22 @@
 
 #include "../lw_common.h"
 
-lw_stream * lw_fdstream_new (lw_pump * pump)
-    { return (lw_stream *) new FDStream (*(Pump *) pump);
+lw_stream lw_fdstream_new (lw_pump * pump)
+    { return (lw_stream) new FDStream (*(Pump *) pump);
     }
-void lw_fdstream_set_fd (lw_stream * stream, lw_fd fd, lw_pump_watch * watch)
+void lw_fdstream_set_fd (lw_stream stream, lw_fd fd, lw_pump_watch watch)
     { ((FDStream *) stream)->SetFD (fd, (Pump::Watch *) watch);
     }
-void lw_fdstream_cork (lw_stream * stream)
+void lw_fdstream_cork (lw_stream stream)
     { ((FDStream *) stream)->Cork ();
     }
-void lw_fdstream_uncork (lw_stream * stream)
+void lw_fdstream_uncork (lw_stream stream)
     { ((FDStream *) stream)->Uncork ();
     }
-void lw_fdstream_nagle (lw_stream * stream, lw_bool nagle)
+void lw_fdstream_nagle (lw_stream stream, lw_bool nagle)
     { ((FDStream *) stream)->Nagle (nagle);
     }
-lw_bool lw_fdstream_valid (lw_stream * stream)
+lw_bool lw_fdstream_valid (lw_stream stream)
     {   return ((FDStream *) stream)->Valid ();
     }
 

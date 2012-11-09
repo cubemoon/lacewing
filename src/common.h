@@ -100,19 +100,18 @@ void lwp_init ();
 #include <ctype.h>
 #include <time.h>
 
+#include "list.h"
+
 #include "../deps/uthash/uthash.h"
-#include "lw_nvhash.h"
+#include "nvhash.h"
 
 #define lwp_max_path 512
 
 #ifdef _WIN32
-   #include "windows/lw_common.h"
-   #undef SLIST_ENTRY
+   #include "windows/common.h"
 #else
-   #include "unix/lw_common.h"
+   #include "unix/common.h"
 #endif
-
-#include "../deps/queue.h"
 
 #if defined(HAVE_MALLOC_H) || defined(_WIN32)
    #include <malloc.h>
@@ -159,7 +158,7 @@ time_t lwp_parse_time (const char *);
    using namespace Lacewing;
 
    #include <new> 
-   #include "List.h"
+   #include "list.h"
 
    int lwp_create_server_socket
       (Lacewing::Filter &, int Type, int Protocol, Lacewing::Error &Error);

@@ -29,49 +29,49 @@
 
 #include "../lw_common.h"
 
-lw_filter * lw_filter_new ()
-    { return (lw_filter *) new Filter;
+lw_filter lw_filter_new ()
+    { return (lw_filter) new Filter;
     }
-void lw_filter_delete (lw_filter * filter)
+void lw_filter_delete (lw_filter filter)
     { delete (Filter *) filter;
     }
-lw_filter * lw_filter_copy (lw_filter * filter)
-    { return (lw_filter *) new Filter (*(Filter *) filter);
+lw_filter lw_filter_copy (lw_filter filter)
+    { return (lw_filter) new Filter (*(Filter *) filter);
     }
-void lw_filter_set_local (lw_filter * filter, lw_addr * addr)
+void lw_filter_set_local (lw_filter filter, lw_addr * addr)
     { ((Filter *) filter)->Local ((Address *) addr);
     }
-lw_addr * lw_filter_get_local (lw_filter * filter)
-    { return (lw_addr *) ((Filter *) filter)->Local ();
+lw_addr lw_filter_get_local (lw_filter filter)
+    { return (lw_addr) ((Filter *) filter)->Local ();
     }
-void lw_filter_set_remote (lw_filter * filter, lw_addr * addr)
+void lw_filter_set_remote (lw_filter filter, lw_addr * addr)
     { ((Filter *) filter)->Remote ((Address *) addr);
     }
-lw_addr * lw_filter_get_remote (lw_filter * filter)
-    { return (lw_addr *) ((Filter *) filter)->Remote ();
+lw_addr lw_filter_get_remote (lw_filter filter)
+    { return (lw_addr) ((Filter *) filter)->Remote ();
     }
-void lw_filter_set_local_port (lw_filter * filter, long port)
+void lw_filter_set_local_port (lw_filter filter, long port)
     { ((Filter *) filter)->LocalPort (port);
     }
-long lw_filter_get_local_port (lw_filter * filter)
+long lw_filter_get_local_port (lw_filter filter)
     { return ((Filter *) filter)->LocalPort ();
     }
-void lw_filter_set_remote_port (lw_filter * filter, long port)
+void lw_filter_set_remote_port (lw_filter filter, long port)
     { ((Filter *) filter)->RemotePort (port);
     }
-long lw_filter_get_remote_port (lw_filter * filter)
+long lw_filter_get_remote_port (lw_filter filter)
     { return ((Filter *) filter)->RemotePort ();
     }
-void lw_filter_set_reuse (lw_filter * filter, lw_bool reuse)
+void lw_filter_set_reuse (lw_filter filter, lw_bool reuse)
     { ((Filter *) filter)->Reuse (reuse != 0);
     }
-lw_bool lw_filter_is_reuse_set (lw_filter * filter)
+lw_bool lw_filter_is_reuse_set (lw_filter filter)
     { return ((Filter *) filter)->Reuse ();
     }
-void lw_filter_set_ipv6 (lw_filter * filter, lw_bool enabled)
+void lw_filter_set_ipv6 (lw_filter filter, lw_bool enabled)
     { ((Filter *) filter)->IPv6 (enabled);
     }
-lw_bool lw_filter_is_ipv6 (lw_filter * filter)
+lw_bool lw_filter_is_ipv6 (lw_filter filter)
     { return ((Filter *) filter)->IPv6 ();
     }
 

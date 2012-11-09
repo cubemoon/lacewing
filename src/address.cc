@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#include "lw_common.h"
-#include "Address.h"
+#include "common.h"
+#include "address.h"
 
 static void Resolver (Address::Internal *);
 

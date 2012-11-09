@@ -586,7 +586,7 @@ void Webserver::Request::Internal::SetCookie
 
     if (!cookie)
     {
-        cookie = (Request::Internal::Cookie *) malloc (sizeof (*cookie));
+        cookie = (Request::Internal::Cookie *) calloc (sizeof (*cookie), 1);
 
         cookie->Changed = changed;
 

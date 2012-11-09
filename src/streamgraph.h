@@ -1,5 +1,5 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2012 James McLaughlin.  All rights reserved.
  *
@@ -27,69 +27,64 @@
  * SUCH DAMAGE.
  */
 
-#pragma once
+#ifndef _lw_streamgraph_h
+#define _lw_streamgraph_h
 
-struct StreamGraph
+typedef struct lwp_streamgraph_link
 {
-    StreamGraph ();
-    ~ StreamGraph ();
+    lw_stream to, to_exp;
+    lw_stream from, from_exp;
 
+    size_t bytes_left; /* ctor: = -1 */
 
-    /* Merges another graph into this one, and then deletes it. */
+    lw_bool delete_stream;
 
-    void Swallow (StreamGraph *);
+} * lwp_streamgraph_link;
 
-
+typedef struct lwp_streamgraph
+{
     /* Each StreamGraph actually stores two graphs - one public without the
      * filters, and an internally expanded version with the filters included.
      */
 
-    struct Link
-    {
-        inline Link (Stream::Internal * _From, Stream::Internal * _FromExp, 
-                        Stream::Internal * _To, Stream::Internal * _ToExp,
-                           size_t _BytesLeft, bool _DeleteStream)
+    lwp_list (lw_stream, roots);
+    lwp_list (lw_stream, roots_expanded);
 
-            : From (_From), FromExp (_FromExp), To (_To), ToExp (_ToExp),
-                BytesLeft (_BytesLeft), DeleteStream (_DeleteStream)
-        {
-        }
+    int last_expand;
+    int user_count;
 
-        inline Link ()
-        {
-            memset (this, 0, sizeof (StreamGraph::Link));
+    lw_bool dead;
 
-            BytesLeft = -1;
-        }
+} * lwp_streamgraph;
 
-        Stream::Internal * To;
-        Stream::Internal * ToExp;
+lwp_streamgraph lwp_streamgraph_new ();
+void lwp_streamgraph_delete (lwp_streamgraph);
 
-        Stream::Internal * From;
-        Stream::Internal * FromExp;
 
-        size_t BytesLeft;
+/* Merge another graph into this one, and then delete it.  This is used, for
+ * example, when writing one stream to another.
+ */
+ void lwp_streamgraph_swallow (lwp_streamgraph graph, lwp_streamgraph old_graph);
 
-        bool DeleteStream;
-    };
 
-    List <Stream::Internal *> Roots;
-    List <Stream::Internal *> RootsExpanded;
+/* Clear the expanded graph.  This is usually done before modifying the
+ * non-expanded version.
+ */
+ void lwp_streamgraph_clear_expanded (lwp_streamgraph);
 
-    void ClearExpanded ();
 
-    void Expand ();
-    void Read ();
+/* Generate the expanded graph.  This is usually done after modifying the
+ * non-expanded version.
+ */
+ void lwp_streamgraph_expand (lwp_streamgraph);
 
-    int LastExpand;
 
-    int UserCount;
-    bool Dead;
-    
-    void Delete ();
+/* Scan through the graph and issue a read wherever a link needs one.
+ * Depending on how the graph was modified, this may or may not be necessary
+ * after expansion.
+ */
+ void lwp_streamgraph_read (lwp_streamgraph);
 
-    /* Print the graph to lwp_trace */
+#endif
 
-    void Print ();
-};
 

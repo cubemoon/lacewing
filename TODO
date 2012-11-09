@@ -1,14 +1,16 @@
-- SPDY support for Windows
+
+- Convert remaining classes to C
+- OpenSSL/SPDY support for Windows
 - HTTP post arrays
 - Support for /dev/poll in EventPump
 - EventPump::StartSleepyTicking on *nix
 - Use OS X security APIs instead of disabling the warnings for OpenSSL
 - Xcode project/framework
 - Check iOS compatibility
+- Check compatibility with OpenBSD, NetBSD, DragonFlyBSD, Solaris
 - HTTP client
 - WebSockets
 - Try to get SWIG working with liblacewing's nested classes
 - writev style Put overload?
-
 
 

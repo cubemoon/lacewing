@@ -1,5 +1,5 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2012 James McLaughlin.  All rights reserved.
  *
@@ -27,33 +27,20 @@
  * SUCH DAMAGE.
  */
 
-#include "lw_common.h"
+#ifndef _lw_heap_buffer
+#define _lw_heap_buffer
 
-Pipe::Pipe ()
-{
-}
+typedef struct _lwp_heapbuffer * lwp_heapbuffer;
 
-Pipe::Pipe (Lacewing::Pump &pump) : Stream (pump)
-{
-}
+void lwp_heapbuffer_init (lwp_heapbuffer);
+void lwp_heapbuffer_free (lwp_heapbuffer);
 
-Pipe::~ Pipe ()
-{
-}
+lw_bool lwp_heapbuffer_add (lwp_heapbuffer, const char * buffer, size_t size);
 
-size_t Pipe::Put (const char * buffer, size_t size)
-{
-    /* Put should never be called when IsTransparent returns true */
+void lwp_heapbuffer_reset (lwp_heapbuffer);
+size_t lwp_heapbuffer_size (lwp_heapbuffer);
 
-    assert (false);
+char * lwp_heapbuffer_buffer (lwp_heapbuffer);
 
-    return size;
-}
-
-bool Pipe::IsTransparent ()
-{
-    return true;
-}
-
-
+#endif
 

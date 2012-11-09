@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "lw_common.h"
+#include "common.h"
 
 static char version [64] = { 0 };
 
@@ -50,8 +50,8 @@ const char * lw_version ()
          platform = name.sysname;
       #endif
 
-      sprintf (version, "liblacewing 0.4.3 (%s, %s)",
-                     platform, sizeof(void *) == 8 ? "64-bit" : "32-bit");
+      sprintf (version, "liblacewing 0.5.0 (%s, %d-bit)",
+                     platform, ((int) sizeof(void *)) * 8);
    }
 
    return version;
@@ -76,7 +76,7 @@ void lw_dump (const char * buffer, size_t size)
    if (size == -1)
       size = strlen (buffer);
 
-   fprintf (stderr, "=== " lwp_fmt_size " bytes @ " lwp_fmt_size " ===\n", size, buffer);
+   fprintf (stderr, "=== " lwp_fmt_size " bytes @ %p ===\n", size, buffer);
 
    while (size > 0)
    {
@@ -159,8 +159,8 @@ void lwp_trace (const char * format, ...)
    va_list args;
    char * data;
    size_t size;
-   static lw_sync * sync = 0;
-   lw_sync_lock * lock;
+   static lw_sync sync = 0;
+   lw_sync_lock lock;
 
    va_start (args, format);
    
