@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "lw_common.h"
+#include "common.h"
 
 void lwp_disable_ipv6_only (lwp_socket socket)
 {

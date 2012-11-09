@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 lw_stream lw_client_new (lw_pump pump)
     { return (lw_stream) new Client (*(Pump *) pump);
@@ -50,7 +50,7 @@ lw_bool lw_client_connected (lw_stream client)
 lw_bool lw_client_connecting (lw_stream client)
     { return ((Client *) client)->Connecting ();
     }
-lw_addr * lw_client_server_addr (lw_stream client)
+lw_addr lw_client_server_addr (lw_stream client)
     { return (lw_addr) &((Client *) client)->ServerAddress ();
     }
 

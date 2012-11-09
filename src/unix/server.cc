@@ -27,9 +27,9 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
-#include "../openssl/SSLClient.h"
-#include "../Address.h"
+#include "../common.h"
+#include "../openssl/sslclient.h"
+#include "../address.h"
 
 static void onClientClose (Stream &, void * tag);
 static void onClientData (Stream &, void * tag, const char * buffer, size_t size);

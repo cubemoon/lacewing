@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "Common.h"
+#include "common.h"
 
 WebserverClient::WebserverClient (Webserver::Internal &_Server, Server::Client &_Socket, bool _Secure)
     : Server (_Server), Socket (_Socket), Secure (_Secure), Timeout (_Server.Timeout)

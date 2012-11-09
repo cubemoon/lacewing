@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 lw_server * lw_server_new (lw_pump * pump)
     { return (lw_server *) new Server (*(Pump *) pump);

@@ -27,9 +27,9 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
-lw_flashpolicy* lw_flashpolicy_new (lw_pump * pump)
+lw_flashpolicy lw_flashpolicy_new (lw_pump * pump)
     { return (lw_flashpolicy) new FlashPolicy (*(Pump *) pump);
     }
 void lw_flashpolicy_delete (lw_flashpolicy fp)

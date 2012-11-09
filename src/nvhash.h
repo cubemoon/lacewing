@@ -30,24 +30,24 @@
 #ifndef _lw_nvhash_h
 #define _lw_nvhash_h
 
-typedef struct _lw_nvhash
+typedef struct _lwp_nvhash
 {
    char * key;
    char * value;
 
    UT_hash_handle hh;
 
-} * lw_nvhash;
+} * lwp_nvhash;
 
-void lw_nvhash_set (lw_nvhash *, const char * key, const char * value,
-                    lw_bool copy);
+void lwp_nvhash_set (lwp_nvhash *, const char * key, const char * value,
+                     lw_bool copy);
 
-void lw_nvhash_set_ex (lw_nvhash *, size_t key_len, const char * key,
+void lwp_nvhash_set_ex (lwp_nvhash *, size_t key_len, const char * key,
                        size_t value_len, const char * value, lw_bool copy);
 
-const char * lw_nvhash_get (lw_nvhash *, const char * key, const char * def);
+const char * lwp_nvhash_get (lwp_nvhash *, const char * key, const char * def);
 
-void lw_nvhash_clear (lw_nvhash *);
+void lwp_nvhash_clear (lwp_nvhash *);
 
 #endif
 

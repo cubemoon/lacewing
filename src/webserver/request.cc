@@ -27,9 +27,9 @@
  * SUCH DAMAGE.
  */
 
-#include "Common.h"
+#include "common.h"
 
-Webserver::Request::Request (Pump &_Pump) : Stream (_Pump)
+Webserver::Request::Request (Pump &_Pump) : Stream (Stream::New (_Pump))
 {
 }
 
@@ -98,8 +98,8 @@ void Webserver::Request::Internal::Clean ()
         }
     }
     
-    lw_nvhash_clear (&GetItems);
-    lw_nvhash_clear (&PostItems);
+    lwp_nvhash_clear (&GetItems);
+    lwp_nvhash_clear (&PostItems);
 
     Cookies    = 0;
     GetItems   = 0;
@@ -467,7 +467,7 @@ bool Webserver::Request::Internal::In_URL (size_t length, const char * URL)
                 }
                 else
                 {
-                    lw_nvhash_set (&GetItems, name_decoded, value_decoded, lw_false);
+                    lwp_nvhash_set (&GetItems, name_decoded, value_decoded, lw_false);
                 }
             }
         }
@@ -720,12 +720,12 @@ const char * Webserver::Request::Cookie::Value ()
 
 const char * Webserver::Request::Body ()
 {
-    return internal->Buffer.Buffer;
+    return internal->Buffer.Buffer ();
 }
 
 const char * Webserver::Request::GET (const char * name)
 {
-    return lw_nvhash_get (&internal->GetItems, name, "");
+    return lwp_nvhash_get (&internal->GetItems, name, "");
 }
 
 void Webserver::Request::Internal::ParsePostData ()
@@ -741,8 +741,8 @@ void Webserver::Request::Internal::ParsePostData ()
         return;
     }
 
-    char * post_data = Buffer.Buffer,
-             * end = post_data + Buffer.Size, b = *end;
+    char * post_data = Buffer.Buffer (),
+             * end = post_data + Buffer.Length (), b = *end;
 
     *end = 0;
 
@@ -770,7 +770,7 @@ void Webserver::Request::Internal::ParsePostData ()
         }
         else
         {
-            lw_nvhash_set (&PostItems, name_decoded, value_decoded, lw_false);
+            lwp_nvhash_set (&PostItems, name_decoded, value_decoded, lw_false);
         }
 
         if (!next)
@@ -786,7 +786,7 @@ const char * Webserver::Request::POST (const char * name)
 {
     internal->ParsePostData ();
 
-    return lw_nvhash_get (&internal->PostItems, name, "");
+    return lwp_nvhash_get (&internal->PostItems, name, "");
 }
 
 Webserver::Request::Parameter * Webserver::Request::GET ()
@@ -804,17 +804,17 @@ Webserver::Request::Parameter * Webserver::Request::POST ()
 Webserver::Request::Parameter *
         Webserver::Request::Parameter::Next ()
 {
-    return (Webserver::Request::Parameter *) ((lw_nvhash *) this)->hh.next;
+    return (Webserver::Request::Parameter *) ((lwp_nvhash) this)->hh.next;
 }
 
 const char * Webserver::Request::Parameter::Name ()
 {
-    return ((lw_nvhash *) this)->key;
+    return ((lwp_nvhash) this)->key;
 }
 
 const char * Webserver::Request::Parameter::Value ()
 {
-    return ((lw_nvhash *) this)->value;
+    return ((lwp_nvhash) this)->value;
 }
 
 lw_i64 Webserver::Request::LastModified ()
@@ -854,7 +854,7 @@ void Webserver::Request::IdleTimeout (int seconds)
 
 const char * Webserver::Upload::Filename ()
 {
-    const char * filename = lw_nvhash_get
+    const char * filename = lwp_nvhash_get
         (&internal->Disposition, "filename", ""), * slash;
 
     /* Old versions of IE send the absolute path */
@@ -870,7 +870,7 @@ const char * Webserver::Upload::Filename ()
 
 const char * Webserver::Upload::FormElementName ()
 {
-    return lw_nvhash_get (&internal->Disposition, "name", "");
+    return lwp_nvhash_get (&internal->Disposition, "name", "");
 }
 
 const char * Webserver::Upload::Header (const char * name)

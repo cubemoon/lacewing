@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 lw_udp* lw_udp_new (lw_pump * pump)
     { return (lw_udp *) new UDP (*(Pump *) pump);

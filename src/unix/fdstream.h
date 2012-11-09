@@ -27,28 +27,37 @@
  * SUCH DAMAGE.
  */
 
-#ifndef _lw_heap_buffer
-#define _lw_heap_buffer
+#ifndef _lw_fdstream_h
+#define _lw_fdstream_h
 
-typedef struct _lwp_heapbuffer
+#include "../stream.h"
+
+typedef struct lw_fdstream
 {
-    size_t length, allocated, offset;
-    char buffer [1];
+   struct lw_stream stream;
 
-} * lwp_heapbuffer;
+   int ref_count;
 
-void lwp_heapbuffer_init (lwp_heapbuffer);
-void lwp_heapbuffer_free (lwp_heapbuffer);
+   lw_pump pump;
+   lw_pump_watch watch;
 
-lw_bool lwp_heapbuffer_add (lwp_heapbuffer, const char * buffer, size_t length);
+   int fd;
 
-void lwp_heapbuffer_trim_left (lwp_heapbuffer, size_t);
-void lwp_heapbuffer_trim_right (lwp_heapbuffer, size_t);
+   char flags;
 
-void lwp_heapbuffer_reset (lwp_heapbuffer);
-size_t lwp_heapbuffer_length (lwp_heapbuffer);
+   size_t size;
+   size_t reading_size;
 
-char * lwp_heapbuffer_buffer (lwp_heapbuffer);
+} * lw_fdstream;
+
+#define lwp_fdstream_flag_nagle       1
+#define lwp_fdstream_flag_is_socket   2
+#define lwp_fdstream_flag_autoclose   4
+#define lwp_fdstream_flag_reading     8
+#define lwp_fdstream_flag_dead        16
+
+void lwp_fdstream_init (lw_fdstream, lw_pump);
 
 #endif
+
 

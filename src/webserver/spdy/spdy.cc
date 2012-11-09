@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../Common.h"
+#include "../common.h"
 
 static void spdy_emit (spdy_ctx * ctx, const char * buffer, size_t size)
 {
@@ -89,7 +89,7 @@ SPDYClient::SPDYClient
      * Put will be called again as soon as more data arrives.
      */
 
-    Retry (Retry_MoreData);
+    Retry (lw_stream_retry_more_data);
 }
 
 SPDYClient::~SPDYClient ()

@@ -29,15 +29,9 @@
 
 #include "common.h"
 
-struct _lwp_heapbuffer
-{
-    size_t size, allocated, offset;
-    char buffer [1];
-};
-
 void lwp_heapbuffer_init (lwp_heapbuffer ctx)
 {
-    memset (ctx, 0, sizeof (*ctx));
+    memset (ctx, 0, lengthof (*ctx));
 }
 
 void lwp_heapbuffer_free (lwp_heapbuffer ctx)
@@ -45,19 +39,19 @@ void lwp_heapbuffer_free (lwp_heapbuffer ctx)
     free (ctx);
 }
 
-lw_bool lwp_heapbuffer_add (lwp_heapbuffer ctx, const char * buffer, size_t size)
+lw_bool lwp_heapbuffer_add (lwp_heapbuffer ctx, const char * buffer, length_t length)
 {
    /* TODO: discard data before the offset (might save a realloc) */
 
-    size_t new_size;
+    length_t new_length;
     lw_bool realloc = lw_false;
 
-    if (size == -1)
-        size = strlen (buffer);
+    if (length == -1)
+        length = strlen (buffer);
 
-    new_size = ctx->size + size;
+    new_length = ctx->length + length;
 
-    while (new_size > ctx->allocated)
+    while (new_length > ctx->allocated)
     {
        ctx->allocated = ctx->allocated > 0 ? (ctx->allocated * 3) : (1024 * 4);
        realloc = lw_true;
@@ -65,26 +59,26 @@ lw_bool lwp_heapbuffer_add (lwp_heapbuffer ctx, const char * buffer, size_t size
 
     if (realloc)
     {
-        ctx = (lwp_heapbuffer *) realloc (ctx, sizeof (*ctx) + ctx->allocated);
+        ctx = (lwp_heapbuffer *) realloc (ctx, lengthof (*ctx) + ctx->allocated);
 
         if (!ctx)
            return lw_false;
     }
 
-    memcpy (ctx->buffer + ctx->size, buffer, size);
-    ctx->size = new_size;
+    memcpy (ctx->buffer + ctx->length, buffer, length);
+    ctx->length = new_length;
 
     return lw_true;
 }
 
 void lwp_heapbuffer_reset (lwp_heapbuffer ctx)
 {
-    ctx->size = ctx->offset = 0;
+    ctx->length = ctx->offset = 0;
 }
 
-size_t lwp_heapbuffer_size (lwp_heapbuffer ctx)
+length_t lwp_heapbuffer_length (lwp_heapbuffer ctx)
 {
-   return ctx->size - ctx->offset;
+   return ctx->length - ctx->offset;
 }
 
 char * lwp_heapbuffer_buffer (lwp_heapbuffer ctx)

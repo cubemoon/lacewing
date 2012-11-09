@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "Common.h"
+#include "common.h"
 
 int Multipart::onHeaderField (const char * at, size_t length)
 {
@@ -64,8 +64,8 @@ int Multipart::onHeaderValue (const char * at, size_t length)
 
         if (Child)
         {
-            lw_nvhash_set (&Child->Disposition, "name",
-                            lw_nvhash_get (&Disposition, "name", ""), lw_true);
+            lwp_nvhash_set (&Child->Disposition, "name",
+                            lwp_nvhash_get (&Disposition, "name", ""), lw_true);
         }
     }
     else if (!strcasecmp (header.Name, "Content-Type"))
@@ -74,10 +74,10 @@ int Multipart::onHeaderValue (const char * at, size_t length)
         {
             Child = new Multipart (Server, Request, header.Value);
 
-            const char * name = lw_nvhash_get (&Disposition, "name", 0);
+            const char * name = lwp_nvhash_get (&Disposition, "name", 0);
 
             if (name)
-                lw_nvhash_set (&Child->Disposition, "name", name, lw_true);
+                lwp_nvhash_set (&Child->Disposition, "name", name, lw_true);
         }
     }
 
@@ -86,7 +86,7 @@ int Multipart::onHeaderValue (const char * at, size_t length)
 
 bool Multipart::ParseDisposition (size_t length, const char * disposition)
 {
-    lw_nvhash_clear (&Disposition);
+    lwp_nvhash_clear (&Disposition);
 
     const char s_type = 0,
                s_param_name = 1,
@@ -108,7 +108,7 @@ bool Multipart::ParseDisposition (size_t length, const char * disposition)
 
             if (c == ';' || !c)
             {
-                lw_nvhash_set_ex
+                lwp_nvhash_set_ex
                     (&Disposition, 4, "type", i, disposition, lw_true);
 
                 if (!c)
@@ -172,7 +172,7 @@ bool Multipart::ParseDisposition (size_t length, const char * disposition)
 
             if (c == '"' || c == ';' || !c)
             {
-                lw_nvhash_set_ex
+                lwp_nvhash_set_ex
                     (&Disposition, name_len, disposition + name_begin,
                         i - value_begin, disposition + value_begin, lw_true);
 
@@ -202,7 +202,7 @@ int Multipart::onHeadersComplete ()
     ParsingHeaders = false;
     Request.Buffer.Reset ();
 
-    if (lw_nvhash_get (&Disposition, "filename", 0))
+    if (lwp_nvhash_get (&Disposition, "filename", 0))
     {
         /* A filename was given - assign this part an Upload structure. */
         
@@ -328,15 +328,15 @@ int Multipart::onPartDataEnd ()
 
         Request.Buffer.Add <char> (0);
 
-        lw_nvhash_set (&Request.PostItems,
-                       lw_nvhash_get (&Disposition, "name", ""),
-                       Request.Buffer.Buffer,
+        lwp_nvhash_set (&Request.PostItems,
+                       lwp_nvhash_get (&Disposition, "name", ""),
+                       Request.Buffer.Buffer (),
                        lw_true);
 
         Request.Buffer.Reset ();
     }
 
-    lw_nvhash_clear (&Disposition);
+    lwp_nvhash_clear (&Disposition);
 
     return 0;
 }
@@ -445,7 +445,7 @@ Multipart::~ Multipart ()
 {
     multipart_parser_free (Parser);
     
-    lw_nvhash_clear (&Disposition);
+    lwp_nvhash_clear (&Disposition);
 
     while (Headers.Last)
     {
@@ -492,14 +492,14 @@ size_t Multipart::Process (const char * buffer, size_t buffer_size)
             int toParse = i + 1;
             bool error = false;
 
-            if (Request.Buffer.Size)
+            if (Request.Buffer.Length ())
             {
                 Request.Buffer.Add (buffer, toParse);
 
                 size_t parsed = multipart_parser_execute
-                    (Parser, Request.Buffer.Buffer, Request.Buffer.Size);
+                    (Parser, Request.Buffer.Buffer (), Request.Buffer.Length ());
 
-                if (parsed != Request.Buffer.Size)
+                if (parsed != Request.Buffer.Length ())
                     error = true;
 
                 Request.Buffer.Reset ();

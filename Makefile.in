@@ -15,18 +15,17 @@ SO_NAME = @SO_NAME@
 REAL_NAME = liblacewing.@SO_EXT@.0.5.0
 
 OBJECTS = build/global.o build/nvhash.o build/filter.o build/address.o build/streamgraph.o \
-    build/stream.o build/error.o build/webserver.o build/http.o build/http-parser.o \
-    build/mimetypes.o build/request.o build/sessions.o build/pipe.o build/multipart.o \
-    build/addr_flat.o build/eventpump_flat.o build/server_flat.o build/timer_flat.o \
-    build/webserver_flat.o build/filter_flat.o build/udp_flat.o build/client_flat.o \
-    build/error_flat.o build/sync_flat.o build/thread_flat.o build/flashpolicy.o \
-    build/pump.o build/flashpolicy_flat.o build/stream_flat.o build/fdstream_flat.o \
-    build/file_flat.o build/pipe_flat.o build/pump_flat.o build/util.o \
-	build/multipart_parser.o @OBJECTS@
+build/stream.o build/error.o build/webserver.o build/http.o build/http-parser.o \
+build/mimetypes.o build/request.o build/sessions.o build/pipe.o build/multipart.o \
+build/addr_flat.o build/eventpump_flat.o build/server_flat.o build/timer_flat.o \
+build/webserver_flat.o build/filter_flat.o build/udp_flat.o build/client_flat.o \
+build/error_flat.o build/sync_flat.o build/thread_flat.o build/flashpolicy.o \
+build/pump.o build/flashpolicy_flat.o build/file_flat.o build/pump_flat.o build/util.o \
+build/multipart_parser.o @OBJECTS@
 
 COMMONDEPS = include/lacewing.h src/common.h src/heapbuffer.h src/list.h \
-			 src/webserver/common.h src/webserver/http/http.h src/address.h \
-			 src/stream.h @COMMONDEPS@
+src/webserver/common.h src/webserver/http/http.h src/address.h \
+src/stream.h @COMMONDEPS@
 
 ###########
 
@@ -54,8 +53,8 @@ build/stream.o: src/stream.c $(COMMONDEPS)
 	$(CC) $(CFLAGS) -c -o $@ src/stream.c
 build/streamgraph.o: src/streamgraph.c $(COMMONDEPS)
 	$(CC) $(CFLAGS) -c -o $@ src/streamgraph.c
-build/pipe.o: src/pipe.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/pipe.cc
+build/pipe.o: src/pipe.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/pipe.c
 build/pump.o: src/pump.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/pump.cc
 build/error.o: src/error.cc $(COMMONDEPS)
@@ -87,8 +86,6 @@ build/pump_flat.o: src/wrappers-c/pump_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/pump_flat.cc
 build/eventpump_flat.o: src/wrappers-c/eventpump_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/eventpump_flat.cc
-build/pipe_flat.o: src/wrappers-c/pipe_flat.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/pipe_flat.cc
 build/server_flat.o: src/wrappers-c/server_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/server_flat.cc
 build/timer_flat.o: src/wrappers-c/timer_flat.cc $(COMMONDEPS)
@@ -109,10 +106,6 @@ build/thread_flat.o: src/wrappers-c/thread_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/thread_flat.cc
 build/flashpolicy_flat.o: src/wrappers-c/flashpolicy_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/flashpolicy_flat.cc
-build/stream_flat.o: src/wrappers-c/stream_flat.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/stream_flat.cc
-build/fdstream_flat.o: src/wrappers-c/fdstream_flat.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/fdstream_flat.cc
 build/file_flat.o: src/wrappers-c/file_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/file_flat.cc
 
@@ -133,10 +126,10 @@ build/unix-thread.o: src/unix/thread.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/thread.cc
 build/unix-client.o: src/unix/client.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/client.cc
-build/unix-fdstream.o: src/unix/fdstream.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/fdstream.cc
-build/unix-file.o: src/unix/file.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/file.cc
+build/unix-fdstream.o: src/unix/fdstream.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/unix/fdstream.c
+build/unix-file.o: src/unix/file.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/unix/file.c
 build/unix-sync.o: src/unix/sync.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/sync.cc
 build/unix-global.o: src/unix/global.c $(COMMONDEPS)
@@ -160,8 +153,8 @@ build/windows-compat.o: src/windows/compat.c $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/windows/compat.c
 build/windows-fdstream.o: src/windows/fdstream.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/windows/fdstream.cc
-build/windows-file.o: src/windows/file.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/windows/file.cc
+build/windows-file.o: src/windows/file.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/windows/file.c
 build/windows-sync.o: src/windows/sync.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/windows/sync.cc
 build/windows-winsslclient.o: src/windows/winsslclient.cc $(COMMONDEPS)

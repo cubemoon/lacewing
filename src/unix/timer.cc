@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
-#include "EventPump.h"
+#include "../common.h"
+#include "eventpump.h"
 
 struct Timer::Internal
 {

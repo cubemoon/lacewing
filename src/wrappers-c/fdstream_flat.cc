@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 lw_stream lw_fdstream_new (lw_pump * pump)
     { return (lw_stream) new FDStream (*(Pump *) pump);

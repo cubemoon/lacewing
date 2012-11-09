@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../Common.h"
+#include "../common.h"
 
 #define Callback(F) \
     static int F (http_parser * parser) \
@@ -74,7 +74,7 @@ HTTPClient::HTTPClient (Webserver::Internal &_Server, Server::Client &_Socket, b
      * Put will be called again as soon as more data arrives.
      */
 
-    Retry (Retry_MoreData);
+    Retry (lw_stream_retry_more_data);
 }
 
 HTTPClient::~HTTPClient ()
@@ -395,8 +395,11 @@ void HTTPClient::Respond (Webserver::Request::Internal &) /* request parameter i
 
     Socket.Cork ();
 
+    char * head_buffer = buffer.Buffer();
+    size_t head_length = buffer.Length();
+
     Request.EndQueue
-        (1, (const char **) &buffer.Buffer, &buffer.Size);
+        (1, (const char **) &head_buffer, &head_length);
 
     Request.BeginQueue ();
 
@@ -412,7 +415,7 @@ void HTTPClient::Respond (Webserver::Request::Internal &) /* request parameter i
      * be able to process it now.
      */
 
-    Retry (Retry_Now);
+    Retry (lw_stream_retry_now);
 }
 
 void HTTPClient::Tick ()

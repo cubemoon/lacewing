@@ -26,7 +26,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 struct Lacewing::Event::Internal
 {

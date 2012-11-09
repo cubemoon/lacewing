@@ -1,5 +1,5 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2012 James McLaughlin.  All rights reserved.
  *
@@ -27,75 +27,51 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
+#include "fdstream.h"
 
-struct File::Internal
+typedef struct lw_file
 {
-    char Name [lwp_max_path];
+    struct lw_fdstream fdstream;
 
-    Internal ()
-    {
-        *Name = 0;
-    }
-};
+    char name [lwp_max_path];
 
-static int GetFlags (const char * mode);
+} * lw_file;
 
-File::File (Lacewing::Pump &Pump) : FDStream (Pump)
+void lwp_file_init (lw_file ctx, lw_pump pump)
 {
-    internal = new Internal;
+   *ctx->name = 0;
+
+   lwp_fdstream_init (&ctx->fdstream, pump);
 }
 
-File::File (Lacewing::Pump &Pump, const char * filename, const char * mode)
-                : FDStream (Pump)
+lw_stream lw_file_new (lw_pump pump)
 {
-    internal = new Internal;
+   lw_file ctx = malloc (sizeof (*ctx));
+   lwp_file_init (ctx, pump);
 
-    Open (filename, mode);
+   return (lw_stream) ctx;
 }
 
-File::~ File ()
+lw_stream lw_file_new_open (lw_pump pump,
+                            const char * filename,
+                            const char * mode)
 {
-    delete internal;
+   lw_stream ctx = lw_file_new (pump);
+
+   if (!ctx)
+       return 0;
+
+   if (!lw_file_open (ctx, filename, mode))
+   {
+       lw_stream_delete (ctx);
+       return 0;
+   }
+
+   return ctx;
 }
 
-bool File::Open (const char * filename, const char * mode)
-{
-    lwp_trace ("%p : File::Open \"%s\", \"%s\"",
-                    ((Stream *) (FDStream *) this)->internal, filename, mode);
-
-    *internal->Name = 0;
-
-    int flags = GetFlags (mode);
-
-    if (flags == -1)
-    {
-        lwp_trace ("Error parsing mode");
-        return false;
-    }
-
-    int FD = open (filename, flags, S_IRWXU);
-
-    if (FD == -1)
-    {
-        lwp_trace ("open() failed: %s", strerror (errno));
-        return false;
-    }
-
-    SetFD (FD, 0, true);
-
-    if (Valid ())
-    {
-        strcpy (internal->Name, filename);
-        return true;
-    }
-
-    lwp_trace ("Valid() returned false");
-
-    return false;
-}
-
-int GetFlags (const char * mode)
+static int get_flags (const char * mode)
 {
     /* Based on what FreeBSD does to convert the mode string for fopen(3) */
 
@@ -142,8 +118,49 @@ int GetFlags (const char * mode)
     return flags;
 }
 
-bool File::OpenTemp ()
+lw_bool lw_file_open (lw_stream _ctx,
+                      const char * filename,
+                      const char * mode)
 {
+    lw_file ctx = (lw_file) _ctx;
+
+    lwp_trace ("%p : lw_file_open \"%s\", \"%s\"", ctx, filename, mode);
+
+    *ctx->name = 0;
+
+    int flags = get_flags (mode);
+
+    if (flags == -1)
+    {
+        lwp_trace ("Error parsing mode");
+        return lw_false;
+    }
+
+    int fd = open (filename, flags, S_IRWXU);
+
+    if (fd == -1)
+    {
+        lwp_trace ("open() failed: %s", strerror (errno));
+        return lw_false;
+    }
+
+    lw_fdstream_set_fd ((lw_stream) ctx, fd, 0, lw_true);
+
+    if (lw_stream_valid ((lw_stream) ctx))
+    {
+        strcpy (ctx->name, filename);
+        return lw_true;
+    }
+
+    lwp_trace ("valid() returned false");
+
+    return lw_false;
+}
+
+lw_bool lw_file_open_temp (lw_stream _ctx)
+{
+    lw_file ctx = (lw_file) _ctx;
+
     char name [lwp_max_path];
     char random [8];
     size_t i = 0;
@@ -159,11 +176,11 @@ bool File::OpenTemp ()
 
     lwp_trace ("Opening temp file: %s", name);
 
-    return Open (name, "wb");
+    return lw_file_open ((lw_stream) ctx, name, "wb");
 }
 
-const char * File::Name ()
+const char * lw_file_name (lw_stream ctx)
 {
-    return internal->Name;
+    return ((lw_file) ctx)->name;
 }
 

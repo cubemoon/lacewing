@@ -1,7 +1,7 @@
 
 /* vim: set et ts=4 sw=4 ft=cpp:
  *
- * Copyright (C) 2011 James McLaughlin.  All rights reserved.
+ * Copyright (C) 2011, 2012 James McLaughlin.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,21 +27,21 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
-lw_thread * lw_thread_new (const char * name, void * function)
-    { return (lw_thread *) new Thread (name, function);
+lw_thread lw_thread_new (const char * name, void * function)
+    { return (lw_thread) new Thread (name, function);
     }
-void lw_thread_delete (lw_thread * thread)
+void lw_thread_delete (lw_thread thread)
     { delete (Thread *) thread;
     }
-void lw_thread_start (lw_thread * thread, void * parameter)
+void lw_thread_start (lw_thread thread, void * parameter)
     { ((Thread *) thread)->Start (parameter);
     }
-lw_bool lw_thread_started (lw_thread * thread)
+lw_bool lw_thread_started (lw_thread thread)
     { return ((Thread *) thread)->Started ();
     }
-long lw_thread_join (lw_thread * thread)
+long lw_thread_join (lw_thread thread)
     { return ((Thread *) thread)->Join ();
     }
 

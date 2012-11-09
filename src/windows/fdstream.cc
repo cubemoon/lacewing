@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 static void * FDStreamType = (void *) "FDStream";
 

@@ -27,6 +27,8 @@
  * SUCH DAMAGE.
  */
 
+#include "../common.h"
+
 Stream * Stream::New ()
     { return (Stream *) lw_stream_new ();
     }

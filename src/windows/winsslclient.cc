@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
-#include "WinSSLClient.h"
+#include "../common.h"
+#include "winsslclient.h"
 
 WinSSLClient::Downstream::Downstream (WinSSLClient &_Client)
     : Client (_Client)

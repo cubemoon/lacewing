@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "lw_list.h"
+#include "list.h"
 
 struct
 {

@@ -47,7 +47,7 @@ if test "x$enable_spdy" = xyes; then
              build/spdy_headers.o build/spdy_nv_block.o build/spdy_ping.o \
              build/spdy_rst_stream.o build/spdy_settings.o build/spdy_stream.o \
              build/spdy_strings.o build/spdy_syn_reply.o build/spdy_syn_stream.o \
-             build/spdy_zlib.o build/spdy_window_update.o build/SPDY.o"
+             build/spdy_zlib.o build/spdy_window_update.o build/spdy.o"
 
 	AC_CHECK_LIB([z], [inflate])
 
@@ -109,7 +109,7 @@ else
 fi
 
 CXXFLAGS="$CFLAGS -fno-exceptions -fno-rtti"
-CFLAGS="-ansi -Wall -Wno-format $CFLAGS"
+CFLAGS="-Wall -Wno-format $CFLAGS"
 
 AC_SUBST(OBJECTS, $OBJECTS)
 AC_SUBST(COMMONDEPS, $COMMONDEPS)

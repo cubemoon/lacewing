@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "Common.h"
+#include "common.h"
 
 const char * const SessionCookie = "lw_session";
 
@@ -61,7 +61,7 @@ void Webserver::Request::Session (const char * key, const char * value)
                 session_id_hex, sizeof (session_id_hex), session);
     }
 
-    lw_nvhash_set (&session->data, key, value, lw_true);
+    lwp_nvhash_set (&session->data, key, value, lw_true);
 }
 
 const char * Webserver::Request::Session (const char * key)
@@ -77,7 +77,7 @@ const char * Webserver::Request::Session (const char * key)
     if (!session)
         return "";
 
-    return lw_nvhash_get (&session->data, key, "");
+    return lwp_nvhash_get (&session->data, key, "");
 }
 
 void Webserver::CloseSession (const char * id)
@@ -88,7 +88,7 @@ void Webserver::CloseSession (const char * id)
     if (!session)
         return;
 
-    lw_nvhash_clear (&session->data);
+    lwp_nvhash_clear (&session->data);
     HASH_DEL (internal->Sessions, session);
 }
 
@@ -121,16 +121,16 @@ Webserver::Request::SessionItem * Webserver::Request::FirstSessionItem ()
 Webserver::Request::SessionItem *
         Webserver::Request::SessionItem::Next ()
 {
-    return (SessionItem *) ((lw_nvhash *) this)->hh.next;
+    return (SessionItem *) ((lwp_nvhash) this)->hh.next;
 }
 
 const char * Webserver::Request::SessionItem::Name ()
 {
-    return ((lw_nvhash *) this)->key;
+    return ((lwp_nvhash) this)->key;
 }
 
 const char * Webserver::Request::SessionItem::Value ()
 {
-    return ((lw_nvhash *) this)->value;
+    return ((lwp_nvhash) this)->value;
 }
 

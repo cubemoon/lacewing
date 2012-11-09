@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
-#include "EventPump.h"
+#include "../common.h"
+#include "eventpump.h"
 
 const char SigExitEventLoop  = 1;
 const char SigRemove         = 2;
@@ -265,7 +265,7 @@ Error * EventPump::StartEventLoop ()
 }
 
 Error * EventPump::StartSleepyTicking
-    (void (LacewingHandler * onTickNeeded) (EventPump &EventPump))
+    (void (lw_callback * onTickNeeded) (EventPump &EventPump))
 {
     /* TODO */
 

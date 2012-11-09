@@ -27,14 +27,10 @@
  * SUCH DAMAGE.
  */
 
-#include "lw_common.h"
+#include "common.h"
+#include "stream.h"
 
-struct lw_pipe
-{
-   struct lw_stream stream;
-};
-
-static bool is_transparent (lw_stream)
+static lw_bool def_is_transparent (lw_stream ctx)
 {
    return lw_true;
 }
@@ -44,22 +40,22 @@ const static lw_stream_def pipe_def =
    0, /* sink_data */
    0, /* sink_stream */
    0, /* retry */
-   is_transparent,
+   def_is_transparent,
    0, /* close */
-   0, /* cast */
    0, /* bytes_left */
    0, /* read */
+   0, /* cleanup */
 };
 
-void lw_pipe_init (lw_pipe ctx, lw_pump pump)
+void lw_pipe_init (lw_stream ctx, lw_pump pump)
 {
-   lw_stream_init (&ctx->stream, pipe_def, pump);
+   lwp_stream_init (ctx, &pipe_def, pump);
 }
 
-lw_pipe lw_pipe_new (lw_pump pump)
+lw_stream lw_pipe_new (lw_pump pump)
 {
-   lw_pipe pipe = malloc (sizeof (*pipe));
-   lw_stream_init (&pipe->stream, pump);
+   lw_stream pipe = malloc (sizeof (*pipe));
+   lw_pipe_init (pipe, pump);
 
    return pipe;
 }

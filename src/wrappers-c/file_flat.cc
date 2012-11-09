@@ -27,13 +27,13 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 lw_stream lw_file_new (lw_pump pump)
-    { return (lw_stream *) new File (*(Pump *) pump);
+    { return (lw_stream) new File (*(Pump *) pump);
     }
-lw_stream lw_file_open_new (lw_pump pump, const char * filename, const char * mode)
-    { return (lw_stream *) new File (*(Pump *) pump, filename, mode);
+lw_stream lw_file_new_open (lw_pump pump, const char * filename, const char * mode)
+    { return (lw_stream) new File (*(Pump *) pump, filename, mode);
     }
 lw_bool lw_file_open (lw_stream file, const char * filename, const char * mode)
     { return ((File *) file)->Open (filename, mode);

@@ -64,10 +64,10 @@
 
 #ifndef __APPLE__
    #ifdef TCP_CORK
-      #define LacewingCork TCP_CORK
+      #define lw_cork TCP_CORK
    #else
       #ifdef TCP_NOPUSH
-         #define LacewingCork TCP_NOPUSH 
+         #define lw_cork TCP_NOPUSH 
       #else
          #error "No TCP_CORK or TCP_NOPUSH available on this platform"
       #endif

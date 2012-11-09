@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 lw_timer * lw_timer_new (lw_pump * pump)
     { return (lw_timer *) new Timer (*(Pump *) pump);

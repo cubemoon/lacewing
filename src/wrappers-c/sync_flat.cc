@@ -1,7 +1,7 @@
 
 /* vim: set et ts=4 sw=4 ft=cpp:
  *
- * Copyright (C) 2011 James McLaughlin.  All rights reserved.
+ * Copyright (C) 2011, 2012 James McLaughlin.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,21 +27,21 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
-lw_sync * lw_sync_new ()
-    { return (lw_sync *) new Sync ();
+lw_sync lw_sync_new ()
+    { return (lw_sync) new Sync ();
     }
-void lw_sync_delete (lw_sync * sync)
+void lw_sync_delete (lw_sync sync)
     { delete (Sync *) sync;
     }
-lw_sync_lock * lw_sync_lock_new (lw_sync * sync)
-    { return (lw_sync_lock *) new Sync::Lock (*(Sync *) sync);
+lw_sync_lock lw_sync_lock_new (lw_sync sync)
+    { return (lw_sync_lock) new Sync::Lock (*(Sync *) sync);
     }
-void lw_sync_lock_delete (lw_sync_lock * lock)
+void lw_sync_lock_delete (lw_sync_lock lock)
     { delete (Sync::Lock *) lock;
     }
-void lw_sync_lock_release (lw_sync_lock * lock)
+void lw_sync_lock_release (lw_sync_lock lock)
     { ((Sync::Lock *) lock)->Release ();
     }
 

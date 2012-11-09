@@ -31,7 +31,7 @@
 #define _lw_list_h
 
 #define lwp_list(type, name) \
-   type * name;
+   type * name
 
 #ifdef __cplusplus
 extern "C"
@@ -39,6 +39,7 @@ extern "C"
 #endif
 
    void _lwp_list_push (void ** list, size_t value_size, ...);
+   void _lwp_list_push_front (void ** list, size_t value_size, ...);
 
 #ifdef __cplusplus
 }

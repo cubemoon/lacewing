@@ -60,7 +60,7 @@ struct lw_stream
     {
         lw_stream_handler_data proc;
 
-        lw_stream * stream;
+        lw_stream stream;
         void * tag;
 
     };
@@ -181,7 +181,7 @@ void lwp_stream_init (lw_stream, const lw_stream_def * def, lw_pump);
  * registered, and the queue is empty.
  */
 
- bool lwp_stream_is_transparent (lw_stream);
+ lw_bool lwp_stream_is_transparent (lw_stream);
 
     
 /* Pushes data forward to any streams next in the graph.  buffer may be

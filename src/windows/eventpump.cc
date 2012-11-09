@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 #define SigExitEventLoop     ((OVERLAPPED *) 1)
 #define SigRemove            ((OVERLAPPED *) 2)
@@ -54,7 +54,7 @@ struct EventPump::Internal
         HandlerTickNeeded  = 0;
     }
 
-    void (LacewingHandler * HandlerTickNeeded) (Lacewing::EventPump &EventPump);
+    void (lw_callback * HandlerTickNeeded) (Lacewing::EventPump &EventPump);
 
     static bool Process (EventPump::Internal * internal, OVERLAPPED * Overlapped,
                             unsigned int BytesTransferred, Pump::Watch * Watch, int Error)
@@ -147,8 +147,9 @@ Error * EventPump::Tick ()
     {
         /* Process whatever the watcher thread dequeued before telling the caller to tick */
 
-        Internal::Process (internal, internal->WatcherOverlapped, internal->WatcherBytesTransferred,
-                            internal->WatcherEvent, internal->WatcherError); 
+        Internal::Process (internal, internal->WatcherOverlapped,
+                           internal->WatcherBytesTransferred,
+                           internal->WatcherEvent, internal->WatcherError); 
     }
 
     OVERLAPPED * Overlapped;
@@ -219,7 +220,8 @@ void EventPump::PostEventLoopExit ()
     PostQueuedCompletionStatus (internal->CompletionPort, 0, 0, SigExitEventLoop);
 }
 
-Error * EventPump::StartSleepyTicking (void (LacewingHandler * onTickNeeded) (EventPump &EventPump))
+Error * EventPump::StartSleepyTicking
+    (void (lw_callback * onTickNeeded) (EventPump &EventPump))
 {
     internal->HandlerTickNeeded = onTickNeeded;    
     internal->WatcherThread.Start (internal);

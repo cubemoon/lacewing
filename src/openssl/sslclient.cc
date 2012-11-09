@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
-#include "SSLClient.h"
+#include "../common.h"
+#include "sslclient.h"
 
 SSLClient::Downstream::Downstream (SSLClient &_Client)
     : Client (_Client)

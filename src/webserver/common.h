@@ -27,8 +27,8 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
-#include "../HeapBuffer.h"
+#include "../common.h"
+#include "../heapbuffer-cxx.h"
 #include "../../deps/multipart-parser/multipart_parser.h"
 
 class WebserverClient;
@@ -43,7 +43,7 @@ struct Webserver::Upload::Internal : public Webserver::Upload
 {
     Webserver::Request::Internal &Request;
 
-    lw_nvhash * Disposition;
+    lwp_nvhash Disposition;
     
     File * AutoSaveFile;
     char * AutoSaveFilename;
@@ -66,7 +66,7 @@ struct Webserver::Upload::Internal : public Webserver::Upload
     {
         lwp_trace("Free upload!");
 
-        lw_nvhash_clear (&Disposition);
+        lwp_nvhash_clear (&Disposition);
 
         while (Headers.Last)
         {
@@ -101,7 +101,7 @@ struct Multipart
     size_t Process (const char * buffer, size_t size);
     bool Done;
 
-    lw_nvhash * Disposition;
+    lwp_nvhash Disposition;
 
     /* Call the handler if all auto save files are now closed */
 
@@ -151,7 +151,7 @@ struct Webserver::Internal
 
     struct Session
     {
-        lw_nvhash * data;
+        lwp_nvhash data;
         UT_hash_handle hh;
     };
     
@@ -298,7 +298,7 @@ struct Webserver::Request::Internal : public Webserver::Request
     char Hostname   [128];
 
     List <WebserverHeader> InHeaders;
-    lw_nvhash * GetItems, * PostItems;
+    lwp_nvhash GetItems, PostItems;
 
     bool In_Version (size_t len, const char * version);
 
@@ -356,9 +356,9 @@ public:
     struct Multipart * Multipart;
 };
 
-#include "http/HTTP.h"
+#include "http/http.h"
 
 #ifndef LacewingNoSPDY
-    #include "spdy/SPDY.h"
+    #include "spdy/spdy.h"
 #endif
 

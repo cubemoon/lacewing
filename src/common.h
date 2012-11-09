@@ -75,14 +75,14 @@
 
 #ifdef LacewingLibrary
    #ifdef _WIN32
-      #define LacewingFunction __declspec(dllexport)
+      #define lw_import __declspec(dllexport)
    #else
       #ifdef __GNUC__
-         #define LacewingFunction __attribute__((visibility("default")))
+         #define lw_import __attribute__((visibility("default")))
       #endif
    #endif
 #else
-   #define LacewingFunction
+   #define lw_import
 #endif
 
 #include "../include/lacewing.h"
@@ -158,7 +158,8 @@ time_t lwp_parse_time (const char *);
    using namespace Lacewing;
 
    #include <new> 
-   #include "list.h"
+
+   #include "list-cxx.h"
 
    int lwp_create_server_socket
       (Lacewing::Filter &, int Type, int Protocol, Lacewing::Error &Error);

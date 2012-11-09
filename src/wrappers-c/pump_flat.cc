@@ -27,7 +27,7 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
 void lw_pump_delete (lw_pump * pump)
     { delete (Pump *) pump;

@@ -1,7 +1,7 @@
 
 /* vim: set et ts=4 sw=4 ft=cpp:
  *
- * Copyright (C) 2011 James McLaughlin.  All rights reserved.
+ * Copyright (C) 2011, 2012 James McLaughlin.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,9 +27,9 @@
  * SUCH DAMAGE.
  */
 
-#include "../lw_common.h"
+#include "../common.h"
 
-lw_error* lw_error_new ()
+lw_error lw_error_new ()
     { return (lw_error) new Error ();
     }
 void lw_error_delete (lw_error error)
@@ -41,7 +41,7 @@ void lw_error_add (lw_error error, long code)
 const char* lw_error_tostring (lw_error error)
     { return ((Error *) error)->ToString ();
     }
-lw_error* lw_error_clone (lw_error error)
+lw_error lw_error_clone (lw_error error)
     {  return (lw_error) ((Error *) error)->Clone ();
     }
 
