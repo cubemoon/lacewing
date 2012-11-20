@@ -41,7 +41,7 @@ typedef struct lwp_streamgraph_link
 
 } * lwp_streamgraph_link;
 
-typedef struct lwp_streamgraph
+typedef struct _lwp_streamgraph
 {
     /* Each StreamGraph actually stores two graphs - one public without the
      * filters, and an internally expanded version with the filters included.

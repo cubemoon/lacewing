@@ -1,5 +1,5 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2012 James McLaughlin.  All rights reserved.
  *
@@ -27,64 +27,22 @@
  * SUCH DAMAGE.
  */
 
-namespace Lacewing
-{
-    class SSLClient
-    {
-        ssl_st * SSL;
-        BIO * InternalBIO, * ExternalBIO;
+#ifndef _lw_sslclient_h
+#define _lw_sslclient_h
 
-        void Pump ();
+typedef struct _lwp_sslclient * lwp_sslclient;
 
-        int WriteCondition;
+typedef void (* lwp_sslclient_on_handshook) (lwp_sslclient, void * tag);
 
-    public:
+lwp_sslclient lwp_sslclient_new (SSL_CTX * server_context, lw_stream socket,
+                                 lwp_sslclient_on_handshook, void * tag);
 
-        bool Handshook, Pumping, Dead;
+void lwp_sslclient_delete (lwp_sslclient);
 
-        void * tag;
-        void (* onHandshook) (SSLClient &);
+lw_bool lwp_sslclient_handshook (lwp_sslclient);
 
-        #ifdef LacewingNPN
-            unsigned char NPN [32];
-        #endif
+const char * lwp_sslclient_npn (lwp_sslclient);
 
-        SSLClient (SSL_CTX *);
-        ~ SSLClient ();
-
-
-
-        /* Data coming from the network passes through this Stream first */
-
-        struct Downstream : public Stream
-        {
-            SSLClient &Client;
-
-            Downstream (SSLClient &);
-
-            size_t Put (const char * buffer, size_t size);
-
-            friend class Lacewing::SSLClient;
-
-        } Downstream;
-
-
-        /* Data destined for the network passes through this Stream first */
-
-        struct Upstream : public Stream
-        {
-            SSLClient &Client;
-
-            Upstream (SSLClient &);
-
-            size_t Put (const char * buffer, size_t size);
-
-            friend class Lacewing::SSLClient;
-
-        } Upstream;
-
-    };
-}
-
+#endif
 
 

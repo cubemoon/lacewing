@@ -1,5 +1,5 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2011, 2012 James McLaughlin.  All rights reserved.
  *
@@ -29,50 +29,27 @@
 
 #include "../../../deps/http-parser/http_parser.h"
 
-struct HTTPRequest : public Webserver::Request::Internal
+typedef struct lwp_ws_httpclient
 {
-    HTTPRequest (Webserver::Internal &, WebserverClient &);
+   struct lwp_ws_client client;
 
-    size_t Put (const char * buffer, size_t size);
+   struct lw_ws_req request; /* HTTP is one request at a time, so this is just reused */
 
-    bool IsTransparent ();
-};
+   time_t last_activity;
 
-class HTTPClient : public WebserverClient
-{
-    time_t LastActivityTime;
+   http_parser parser;
 
-    http_parser Parser;
-
-    bool ParsingHeaders, SignalEOF;
+   lw_bool parsing_headers, signal_eof;
     
-    char * CurHeaderName;
-    size_t CurHeaderNameLength;
+   char * cur_header_name;
+   size_t cur_header_name_length;
 
-public:
+} * lwp_ws_httpclient;
 
-    HTTPRequest Request; /* HTTP is one request at a time, so this is just reused */
+lwp_ws_client lwp_ws_httpclient_new
+   (lw_ws, lw_server_client socket, lw_bool secure);
 
-    HTTPClient (Webserver::Internal &, Lacewing::Server::Client &, bool Secure);
-    ~ HTTPClient ();
+void lwp_ws_httpclient_delete (lw_ws, lwp_ws_httpclient);
 
-    size_t Put (const char * buffer, size_t size);
-
-
-    /* HTTP parser callbacks */
-
-    int onMessageBegin ();
-    int onHeadersComplete ();
-    int onMessageComplete ();
-
-    int onURL (char *, size_t);
-    int onBody (char *, size_t);
-    int onHeaderField (char *, size_t);
-    int onHeaderValue (char *, size_t);
-
-
-    void Respond (Webserver::Request::Internal &);
-
-    void Tick ();
-};
+const http_parser_settings lwp_ws_http_parser_settings;
 

@@ -47,7 +47,7 @@ const static lw_stream_def pipe_def =
    0, /* cleanup */
 };
 
-void lw_pipe_init (lw_stream ctx, lw_pump pump)
+void lwp_pipe_init (lw_stream ctx, lw_pump pump)
 {
    lwp_stream_init (ctx, &pipe_def, pump);
 }

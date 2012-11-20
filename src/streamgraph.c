@@ -53,7 +53,7 @@ void lwp_streamgraph_delete (lwp_streamgraph graph)
 static void swallow (lwp_streamgraph graph, lw_stream stream)
 {
    struct lwp_stream_filterspec * spec;
-   struct lwp_streamgraph_link * link;
+   lwp_streamgraph_link link;
 
    assert (graph);
    assert (stream->graph);
@@ -106,7 +106,7 @@ static void expand_stream (lwp_streamgraph graph, lw_stream stream,
                            lw_stream * first, lw_stream * last)
 {
    struct lwp_stream_filterspec * spec;
-   struct lwp_stream_data_handler handler;
+   struct lwp_stream_data_hook hook;
 
    *first = *last = 0;
 
@@ -184,11 +184,11 @@ static void expand_stream (lwp_streamgraph graph, lw_stream stream,
    }
 
 
-   /* The last downstream filter is in charge of calling any data handlers */
+   /* The last downstream filter is in charge of calling any data hooks */
 
-   lwp_list_each (stream->data_handlers, handler)
+   lwp_list_each (stream->data_hooks, hook)
    {
-      lwp_list_push ((*last)->exp_data_handlers, handler);
+      lwp_list_push ((*last)->exp_data_hooks, hook);
    }
 }
 
@@ -318,7 +318,7 @@ static void graph_read (lwp_streamgraph graph, int this_expand,
 
    do
    {
-      if (lwp_list_length (stream->exp_data_handlers) > 0)
+      if (lwp_list_length (stream->exp_data_hooks) > 0)
          break;
 
       lw_stream next = 0;
@@ -433,7 +433,7 @@ static void clear_expanded (lw_stream stream)
 
    stream->prev_direct = 0;
 
-   lwp_list_clear (stream->exp_data_handlers);
+   lwp_list_clear (stream->exp_data_hooks);
 }
 
 void lwp_streamgraph_clear_expanded (lwp_streamgraph graph)
@@ -459,9 +459,9 @@ static void print (lwp_streamgraph graph, lw_stream stream, int depth)
 
    assert (stream->graph == graph);
 
-   fprintf (stderr, "stream @ %p (" lwp_fmt_size " bytes, %d handlers)\n",
+   fprintf (stderr, "stream @ %p (" lwp_fmt_size " bytes, %d hooks)\n",
          stream, lw_stream_bytes_left (stream),
-         lwp_list_length (stream->data_handlers));
+         lwp_list_length (stream->data_hooks));
 
    lwp_list_each (stream->next, link)
    {
@@ -481,9 +481,9 @@ static void print_expanded (lwp_streamgraph graph, lw_stream stream, int depth)
 
    assert (stream->graph == graph);
 
-   fprintf (stderr, "stream @ %p (" lwp_fmt_size " bytes, %d handlers)\n",
+   fprintf (stderr, "stream @ %p (" lwp_fmt_size " bytes, %d hooks)\n",
          stream, lw_stream_bytes_left (stream),
-         lwp_list_length (stream->exp_data_handlers));
+         lwp_list_length (stream->exp_data_hooks));
 
    lwp_list_each (stream->next_expanded, link)
    {

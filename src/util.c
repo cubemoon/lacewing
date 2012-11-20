@@ -279,4 +279,9 @@ time_t lwp_parse_time (const char * string)
     return 0;
 }
 
+void lwp_to_lowercase (char * str)
+{
+   for (char * i = str; *i; ++ i)
+      *i = tolower (*i);
+}
 

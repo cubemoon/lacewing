@@ -1,7 +1,7 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
- * Copyright (C) 2011, 2012 James McLaughlin.  All rights reserved.
+ * Copyright (C) 2011, 2012 James McLaughlin et al.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -28,332 +28,160 @@
  */
 
 #include "../common.h"
-#include "../heapbuffer-cxx.h"
 #include "../../deps/multipart-parser/multipart_parser.h"
+#include "../stream.h"
 
-class WebserverClient;
+typedef struct lwp_ws_client * lwp_ws_client;
 
-struct WebserverHeader
+struct lw_ws_req_hdr
 {
-    char * Name, * Value;
-    WebserverHeader * Next;
+    char * name, * value;
+    lw_ws_req_hdr * next;
 };
 
-struct Webserver::Upload::Internal : public Webserver::Upload
+struct lw_ws_upload
 {
-    Webserver::Request::Internal &Request;
+    lw_ws_req request;
 
-    lwp_nvhash Disposition;
+    lwp_nvhash disposition;
     
-    File * AutoSaveFile;
-    char * AutoSaveFilename;
+    lw_file autosave_file;
+    char * autosave_filename;
 
-    void SetAutoSave ();
-
-    List <WebserverHeader> Headers;
-
-    inline Internal (Webserver::Request::Internal &_Request)
-        : Request (_Request)
-    {
-        internal = this;
-        Tag = 0;
-
-        AutoSaveFile = 0;
-        AutoSaveFilename = 0;
-    }
-
-    virtual inline ~ Internal ()
-    {
-        lwp_trace("Free upload!");
-
-        lwp_nvhash_clear (&Disposition);
-
-        while (Headers.Last)
-        {
-            WebserverHeader &header = (** Headers.Last);
-
-            free (header.Name);
-            free (header.Value);
-
-            Headers.Pop ();
-        }
-
-        delete AutoSaveFile;
-
-        free (AutoSaveFilename);
-    }
+    lwp_list (struct lw_ws_req_hdr, headers);
 };
 
-struct Multipart
+lw_ws_upload lwp_ws_upload_new (lw_ws_req request);
+void lwp_ws_upload_delete (lw_ws_upload);
+
+#include "multipart.h"
+
+struct lw_ws_session
 {
-    Webserver::Internal &Server;
-    Webserver::Request::Internal &Request;
-
-    Multipart * Parent, * Child;
-
-    multipart_parser * Parser;
-
-    Multipart (Webserver::Internal &, Webserver::Request::Internal &,
-               const char * content_type);
-
-    ~ Multipart ();
-
-    size_t Process (const char * buffer, size_t size);
-    bool Done;
-
-    lwp_nvhash Disposition;
-
-    /* Call the handler if all auto save files are now closed */
-
-    void TryCallHandler ();
-
-    /* Multipart parser callbacks */
-
-    int onHeaderField (const char * at, size_t length);
-    int onHeaderValue (const char * at, size_t length);
-    int onPartData (const char * at, size_t length);
-    int onPartDataBegin ();
-    int onHeadersComplete ();
-    int onPartDataEnd ();
-    int onBodyEnd ();
-
-protected:
-
-    bool ParsingHeaders;
-
-    const char * CurHeaderName;
-    size_t CurHeaderNameLength;
-    
-    List <WebserverHeader> Headers;
-
-    Webserver::Upload::Internal * CurUpload;
-
-    Webserver::Upload ** Uploads;
-    int NumUploads;
-
-    inline void AddUpload (Webserver::Upload * upload)
-    {
-        Uploads = (Webserver::Upload **)
-            realloc (Uploads, sizeof (Webserver::Upload *) * (++ NumUploads));
-
-        Uploads [NumUploads - 1] = upload;
-    }
-
-    bool ParseDisposition (size_t length, const char * disposition);
+   lwp_nvhash data;
+   UT_hash_handle hh;
 };
 
-struct Webserver::Internal
+struct lw_ws
 {
-    Lacewing::Pump &Pump;
+   lw_pump pump;
 
-    Lacewing::Server * Socket, * SecureSocket;
-    Lacewing::Timer Timer;
+   lw_server socket, socket_secure;
 
-    struct Session
-    {
-        lwp_nvhash data;
-        UT_hash_handle hh;
-    };
-    
-    Session * Sessions;
+   lw_timer timer;
 
-    bool AutoFinish;
+   lw_ws_session sessions;
 
-    static void SocketConnect(Lacewing::Server &, Lacewing::Server::Client &);
-    static void SocketDisconnect(Lacewing::Server &, Lacewing::Server::Client &);
-    static void SocketReceive(Lacewing::Server &, Lacewing::Server::Client &, char * Buffer, size_t);
-    static void SocketError(Lacewing::Server &, Lacewing::Error &);
+   lw_bool auto_finish;
 
-    inline void PrepareSocket()
-    {
-        if(!Socket)
-        {
-            Socket = new Lacewing::Server (Pump);
+   long timeout;
 
-            Socket->Tag = this;
+   lw_ws_hook_error          on_error;
+   lw_ws_hook_get            on_get;
+   lw_ws_hook_post           on_post;
+   lw_ws_hook_head           on_head;
+   lw_ws_hook_upload_start   on_upload_start;
+   lw_ws_hook_upload_chunk   on_upload_chunk;
+   lw_ws_hook_upload_done    on_upload_done;
+   lw_ws_hook_upload_post    on_upload_post;
+   lw_ws_hook_disconnect     on_disconnect;
 
-            Socket->onConnect    (SocketConnect);
-            Socket->onDisconnect (SocketDisconnect);
-            Socket->onError      (SocketError);
-        }
-
-        StartTimer ();
-    }
-
-    inline void PrepareSecureSocket()
-    {
-        if(!SecureSocket)
-        {
-            SecureSocket = new Lacewing::Server (Pump);
-    
-            SecureSocket->Tag = this;
-
-            SecureSocket->onConnect    (SocketConnect);
-            SecureSocket->onDisconnect (SocketDisconnect);
-            SecureSocket->onError      (SocketError);
-
-            #ifndef LacewingNoSPDY
-                SecureSocket->AddNPN ("spdy/3");
-                SecureSocket->AddNPN ("spdy/2");
-            #endif
-
-            SecureSocket->AddNPN ("http/1.1");
-            SecureSocket->AddNPN ("http/1.0");
-        }
-        
-        StartTimer ();
-    }
-
-    int Timeout;
-
-    inline void StartTimer ()
-    {
-        #ifdef LacewingTimeoutExperiment
-
-            if (Timer.Started())
-                return;
-
-            Timer.Start (Timeout * 1000);
-        
-        #endif
-    }
-
-    inline void StopTimer ()
-    {
-        Timer.Stop ();
-    }
-
-    Lacewing::Webserver &Webserver;
-
-    struct
-    {
-        HandlerError        Error;
-        HandlerGet          Get;
-        HandlerPost         Post;
-        HandlerHead         Head;
-        HandlerUploadStart  UploadStart;
-        HandlerUploadChunk  UploadChunk;
-        HandlerUploadDone   UploadDone;
-        HandlerUploadPost   UploadPost;
-        HandlerDisconnect   Disconnect;
-
-    } Handlers;
-
-    inline Internal (Lacewing::Webserver &_Webserver, Lacewing::Pump &_Pump)
-            : Webserver (_Webserver), Pump (_Pump), Timer (_Pump)
-    {
-        Socket = SecureSocket = 0;
-
-        memset (&Handlers, 0, sizeof (Handlers));
-
-        AutoFinish = true;
-        Sessions = 0;
-
-        Timeout = 5;
-
-        Timer.Tag = this;
-        Timer.onTick (TimerTickStatic);
-    }
-
-    static void TimerTickStatic (Lacewing::Timer &);
-    void TimerTick ();
+   void * tag;
 };
 
-class WebserverClient;
-
-struct Webserver::Request::Internal : public Webserver::Request
+struct lw_ws_req_cookie
 {
-    void * Tag;
+   char * name, * value, * attr;
+   lw_bool changed;
 
-    Webserver::Internal &Server;
-    WebserverClient &Client;
-
-    Internal (Webserver::Internal &, WebserverClient &);
-    ~ Internal ();
-
-    void Clean ();
-
-    struct Cookie
-    {
-        char * Name;
-        char * Value;
-        char * Attr;
-
-        bool Changed;
-
-        UT_hash_handle hh;
-
-    } * Cookies;
-
-    void SetCookie (size_t name_len, const char * name,
-                    size_t value_len, const char * value,
-                    size_t attr_len, const char * attr, bool changed);
-
-    /* Input */
-
-    char Version_Major, Version_Minor;
-
-    char Method     [16];
-    char URL        [4096];
-    char Hostname   [128];
-
-    List <WebserverHeader> InHeaders;
-    lwp_nvhash GetItems, PostItems;
-
-    bool In_Version (size_t len, const char * version);
-
-    bool In_Method (size_t len, const char * method);
-
-    bool In_Header (size_t name_len, const char * name,
-                    size_t value_len, const char * value);
-
-    bool In_URL (size_t len, const char * URL);
-    
-    /* The protocol implementation can use this for any intermediate
-     * buffering, providing it contains the request body (if any) when
-     * the handler is called.
-     */
-
-    HeapBuffer Buffer;
-
-    void ParsePostData ();
-    bool ParsedPostData;
-
-
-    /* Output */
-
-    char Status [64];
-
-    List <WebserverHeader> OutHeaders;
-    
-    void BeforeHandler ();
-    void AfterHandler ();
-
-    void RunStandardHandler ();    
-
-    bool Responded;
-    void Respond ();
+   UT_hash_handle hh;
 };
 
-class WebserverClient : public Stream
+struct lw_ws_req
 {
-public:
+   void * tag;
 
-    bool Secure;
+   lw_ws ws;
+   lwp_ws_client client;
 
-    Lacewing::Server::Client &Socket;
-    Webserver::Internal &Server;
+   struct lw_ws_req_cookie * cookies;
 
-    int Timeout;
 
-    WebserverClient (Webserver::Internal &, Lacewing::Server::Client &, bool Secure);
-    virtual ~ WebserverClient ();
+   /* Input */
 
-    virtual void Tick () = 0;
+   char version_major, version_minor;
 
-    virtual void Respond (Webserver::Request::Internal &Request) = 0;
+   char method     [16];
+   char url        [4096];
+   char hostname   [128];
 
-    struct Multipart * Multipart;
+   lwp_list (struct lw_ws_req_hdr, headers_in);
+   lwp_nvhash get_items, post_items;
+
+    
+   /* The protocol implementation can use this for any intermediate
+    * buffering, providing it contains the request body (if any) when
+    * the handler is called.
+    */
+
+   lwp_heapbuffer buffer;
+
+   lw_bool parsed_post_data;
+
+
+   /* Output */
+
+   char status [64];
+
+   lwp_list (struct lw_ws_req_hdr, headers_out);
+
+   lw_bool responded;
+};
+
+void lwp_ws_req_clean (lw_ws_req);
+
+void lwp_ws_req_set_cookie (lw_ws_req, size_t name_len, const char * name,
+                                       size_t value_len, const char * value,
+                                       size_t attr_len, const char * attr,
+                                       lw_bool changed);
+
+/* Request */
+
+lw_bool lwp_ws_req_in_version (lw_ws_req, size_t len, const char * version);
+lw_bool lwp_ws_req_in_method (lw_ws_req, size_t len, const char * method);
+
+lw_bool lwp_ws_req_in_header (lw_ws_req, size_t name_len, const char * name,
+                                         size_t value_len, const char * value);
+
+lw_bool lwp_ws_req_in_url (lw_ws_req, size_t len, const char * url);
+
+
+/* Response */
+
+void lwp_ws_req_before_handler (lw_ws_req);
+void lwp_ws_req_after_handler (lw_ws_req);
+
+void lwp_ws_req_run_handler (lw_ws_req);
+
+void lwp_ws_req_respond (lw_ws_req);
+
+
+struct lwp_ws_client
+{
+   struct lw_stream stream;
+
+   void (* respond) (lwp_ws_client, lw_ws_req request);
+   void (* tick) (lwp_ws_client);
+   void (* cleanup) ();
+
+   lw_bool secure;
+
+   lw_ws ws;
+   lw_server_client socket;
+
+   long timeout;
+
+   lwp_ws_multipart multipart;
 };
 
 #include "http/http.h"

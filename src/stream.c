@@ -69,7 +69,7 @@ void lw_stream_delete (lw_stream ctx)
 
    ++ ctx->user_count;
 
-   lwp_list_clear (ctx->data_handlers);
+   lwp_list_clear (ctx->data_hooks);
 
    lwp_streamgraph_clear_expanded (ctx->graph);
 
@@ -501,35 +501,35 @@ void lw_stream_read (lw_stream ctx, size_t bytes)
 
 void lw_stream_data (lw_stream ctx, const char * buffer, size_t size)
 {
-   struct lwp_stream_data_handler * handler;
+   struct lwp_stream_data_hook * hook;
 
-   int num_data_handlers = lwp_list_length (ctx->exp_data_handlers), i = 0;
+   int num_data_hooks = lwp_list_length (ctx->exp_data_hooks), i = 0;
 
    ++ ctx->user_count;
 
-   /* TODO: The data handler list would be faster to make a copy of if it was
+   /* TODO: The data hook list would be faster to make a copy of if it was
     * a real array.
     */
 
-   struct lwp_stream_data_handler * data_handlers =
-      alloca (num_data_handlers * sizeof (struct lwp_stream_data_handler));
+   struct lwp_stream_data_hook * data_hooks =
+      alloca (num_data_hooks * sizeof (struct lwp_stream_data_hook));
 
-   lwp_list_each (ctx->exp_data_handlers, handler)
+   lwp_list_each (ctx->exp_data_hooks, hook)
    {
-      data_handlers [i ++] = *handler;
+      data_hooks [i ++] = *hook;
 
-      ++ handler->stream->user_count;
+      ++ hook->stream->user_count;
    }
 
-   for (i = 0; i < num_data_handlers; ++ i)
+   for (i = 0; i < num_data_hooks; ++ i)
    {
-      struct lwp_stream_data_handler handler = data_handlers [i];
+      struct lwp_stream_data_hook hook = data_hooks [i];
 
-      if (! (handler.stream->flags & lwp_stream_flag_dead))
-         handler.proc (handler.stream, handler.tag, buffer, size);
+      if (! (hook.stream->flags & lwp_stream_flag_dead))
+         hook.proc (hook.stream, hook.tag, buffer, size);
 
-      if ((-- handler.stream->user_count) == 0)
-         lw_stream_delete (handler.stream);
+      if ((-- hook.stream->user_count) == 0)
+         lw_stream_delete (hook.stream);
    }
 
    /* Write the data to any streams next in the (expanded) graph, if this
@@ -857,7 +857,7 @@ lw_bool lw_stream_close (lw_stream ctx, lw_bool immediate)
 {
    lwp_streamgraph_link link;
    struct lwp_stream_filterspec * spec;
-   struct lwp_stream_close_handler handler;
+   struct lwp_stream_close_hook hook;
 
    if (ctx->flags & lwp_stream_flag_closing)
       return lw_false;
@@ -925,7 +925,7 @@ lw_bool lw_stream_close (lw_stream ctx, lw_bool immediate)
     */
 
    /* TODO: For non-immediate close, don't call this stream's close
-    * handlers until all filters have finished closing.
+    * hooks until all filters have finished closing.
     */
 
    lw_stream * to_close = alloca
@@ -990,12 +990,12 @@ lw_bool lw_stream_close (lw_stream ctx, lw_bool immediate)
       lwp_streamgraph_read (ctx->graph);
    }
 
-   lwp_list_each (ctx->close_handlers, handler)
+   lwp_list_each (ctx->close_hooks, hook)
    {
-      handler.proc (ctx, handler.tag);
+      hook.proc (ctx, hook.tag);
 
       if (ctx->flags & lwp_stream_flag_dead)
-         break;  /* close handler destroyed the stream */
+         break;  /* close hook destroyed the stream */
    }
 
    ctx->flags &= ~ lwp_stream_flag_closing;
@@ -1101,7 +1101,7 @@ lw_bool lwp_stream_is_transparent (lw_stream ctx)
 {
    assert (! (ctx->flags & lwp_stream_flag_dead));
 
-   if (lwp_list_length (ctx->exp_data_handlers) > 0)
+   if (lwp_list_length (ctx->exp_data_hooks) > 0)
       return lw_false;
 
    if (lwp_list_length (ctx->back_queue) > 0
@@ -1116,19 +1116,19 @@ lw_bool lwp_stream_is_transparent (lw_stream ctx)
    return ctx->def->is_transparent && ctx->def->is_transparent (ctx);
 }
 
-void lw_stream_add_handler_data (lw_stream stream,
-                                 lw_stream_handler_data proc,
+void lw_stream_add_hook_data (lw_stream stream,
+                                 lw_stream_hook_data proc,
                                  void * tag)
 {   
-   /* TODO : Prevent the same handler being registered twice? */
+   /* TODO : Prevent the same hook being registered twice? */
 
-   struct lwp_stream_data_handler * handler = calloc (sizeof (*handler), 1);
+   struct lwp_stream_data_hook * hook = calloc (sizeof (*hook), 1);
 
-   handler->proc = proc;
-   handler->stream = stream;
-   handler->tag = tag;
+   hook->proc = proc;
+   hook->stream = stream;
+   hook->tag = tag;
 
-   lwp_list_push (stream->data_handlers, handler);
+   lwp_list_push (stream->data_hooks, hook);
 
    lwp_streamgraph_clear_expanded (stream->graph);
    lwp_streamgraph_expand (stream->graph);
@@ -1136,15 +1136,15 @@ void lw_stream_add_handler_data (lw_stream stream,
    /* TODO: Do we need to call lwp_streamgraph_read here? */
 } 
 
-void lw_stream_remove_handler_data (lw_stream stream,
-                                    lw_stream_handler_data proc,
+void lw_stream_remove_hook_data (lw_stream stream,
+                                    lw_stream_hook_data proc,
                                     void * tag)
 {   
-   struct lwp_stream_data_handler * handler;
+   struct lwp_stream_data_hook * hook;
 
-   lwp_list_reduce (stream->data_handlers, handler)
+   lwp_list_reduce (stream->data_hooks, hook)
    {
-      if (handler->proc != proc || handler->tag != tag)
+      if (hook->proc != proc || hook->tag != tag)
          lwp_list_reduce_keep ();
    }
 
@@ -1152,26 +1152,26 @@ void lw_stream_remove_handler_data (lw_stream stream,
    lwp_streamgraph_expand (stream->graph);
 }
 
-void lw_stream_add_handler_close (lw_stream stream,
-                                  lw_stream_handler_close proc,
+void lw_stream_add_hook_close (lw_stream stream,
+                                  lw_stream_hook_close proc,
                                   void * tag)
 {   
-   struct lwp_stream_close_handler handler = { proc, tag };
-   lwp_list_push (stream->close_handlers, handler);
+   struct lwp_stream_close_hook hook = { proc, tag };
+   lwp_list_push (stream->close_hooks, hook);
 
    lwp_streamgraph_clear_expanded (stream->graph);
    lwp_streamgraph_expand (stream->graph);
 } 
 
-void lw_stream_remove_handler_close (lw_stream stream,
-                                     lw_stream_handler_close proc,
+void lw_stream_remove_hook_close (lw_stream stream,
+                                     lw_stream_hook_close proc,
                                      void * tag)
 {   
-   struct lwp_stream_close_handler handler;
+   struct lwp_stream_close_hook hook;
 
-   lwp_list_reduce (stream->close_handlers, handler)
+   lwp_list_reduce (stream->close_hooks, hook)
    {
-      if (handler.proc != proc || handler.tag != tag)
+      if (hook.proc != proc || hook.tag != tag)
          lwp_list_reduce_keep ();
    }
 

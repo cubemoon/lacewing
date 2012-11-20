@@ -1,5 +1,5 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2012 James McLaughlin.  All rights reserved.
  *
@@ -29,43 +29,18 @@
 
 #include "../../../deps/spdy/include/spdy.h"
 
-struct SPDYRequest : public Webserver::Request::Internal
+typedef struct lwp_ws_spdyclient
 {
-    SPDYRequest (Webserver::Internal &, WebserverClient &, spdy_stream *);
-
-    spdy_stream * stream;
-
-    size_t Put (const char * buffer, size_t size);
-};
-
-class SPDYClient : public WebserverClient
-{
-protected:
+    struct lwp_ws_client client;
 
     spdy_ctx * spdy;
 
-public:
+    lwp_list (lw_ws_req, requests);
 
-    List <Webserver::Request::Internal *> Requests;
+} lwp_ws_spdyclient;
 
-    SPDYClient (Webserver::Internal &, Lacewing::Server::Client &,
-                bool secure, int version);
+lwp_ws_client lwp_ws_spdyclient_new
+   (lw_ws, lw_server_client socket, lw_bool secure, int version);
 
-    ~ SPDYClient ();
-
-    size_t Put (const char * buffer, size_t size);
-
-    void Respond (Webserver::Request::Internal &);
-
-    void Tick ();
-
-    void onRequestComplete (spdy_stream * stream);
-
-    /* libspdy callbacks */
-
-    void onStreamCreate  (spdy_stream *, size_t num_headers, spdy_nv_pair *);
-    void onStreamHeaders (spdy_stream *, size_t num_headers, spdy_nv_pair *);
-    void onStreamData    (spdy_stream *, const char * data, size_t size);
-    void onStreamClose   (spdy_stream *, int status_code);
-};
+void lwp_ws_spdyclient_delete (lw_ws, lwp_ws_spdyclient);
 

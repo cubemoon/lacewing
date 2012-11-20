@@ -30,7 +30,10 @@
 #ifndef _lw_heapbuffer_cxx_h
 #define _lw_heapbuffer_cxx_h
 
-#include "heapbuffer.h"
+extern "C"
+{
+    #include "heapbuffer.h"
+}
 
 namespace Lacewing
 {

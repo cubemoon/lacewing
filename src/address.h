@@ -27,38 +27,23 @@
  * SUCH DAMAGE.
  */
 
-struct Address::Internal
+struct lw_addr
 {
-    Thread ResolverThread;
+    lw_thread resolver_thread;
 
-    Internal ();
-    ~ Internal ();
+    char * hostname, * hostname_to_free;
+    char service [64]; /* port or service name */
 
-    void Init (const char * Hostname, const char * Service, int Hints);
+    int hints;
 
-    char * Hostname, * HostnameToFree;
-    char Service [64]; /* port or service name */
+    struct addrinfo * info_list, * info, * info_to_free;
 
-    int Hints;
+    lw_error error;
 
-    addrinfo * InfoList, * Info, * InfoToFree;
-
-    Lacewing::Error * Error;
-
-    inline void SetError (Lacewing::Error * Error)
-    {
-        delete this->Error;
-        this->Error = Error;
-    }
-
-    char Buffer [64];
-    const char * ToString ();
+    char buffer [64]; /* for to_string */
 };
 
-
-/* Used internally to wrap a sockaddr into an Address, without any dynamic memory allocation */
-
-struct AddressWrapper : public Address::Internal
+/*struct AddressWrapper : public Address::Internal
 {
     char AddressBytes [sizeof (Lacewing::Address)];
 
@@ -93,5 +78,5 @@ struct AddressWrapper : public Address::Internal
     {
         return *(Lacewing::Address *) AddressBytes;
     }
-};
+};*/
 

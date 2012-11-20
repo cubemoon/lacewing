@@ -30,7 +30,6 @@
 #ifndef _lw_stream_h
 #define _lw_stream_h
 
-#include "heapbuffer.h"
 #include "streamgraph.h"
 
 /* BeginQueue has been called */
@@ -56,26 +55,26 @@ struct lw_stream
     char flags;
 
 
-    struct lwp_stream_data_handler
+    struct lwp_stream_data_hook
     {
-        lw_stream_handler_data proc;
+        lw_stream_hook_data proc;
 
         lw_stream stream;
         void * tag;
 
     };
 
-    lwp_list (struct lwp_stream_data_handler *, data_handlers);
+    lwp_list (struct lwp_stream_data_hook *, data_hooks);
     
     
-    struct lwp_stream_close_handler
+    struct lwp_stream_close_hook
     {
-        lw_stream_handler_close proc;
+        lw_stream_hook_close proc;
 
         void * tag;
     };
 
-    lwp_list (struct lwp_stream_close_handler *, close_handlers);
+    lwp_list (struct lwp_stream_close_hook *, close_hooks);
     
 
     struct lwp_stream_filterspec
@@ -108,13 +107,13 @@ struct lw_stream
 
 
     /* StreamGraph::Expand sets head_upstream to the head of the expanded
-     * first filter, and fills exp_data_handlers with the data handlers this
+     * first filter, and fills exp_data_hooks with the data hooks this
      * stream is responsible for calling.
      */
 
     lw_stream head_upstream;
 
-    lwp_list (struct lwp_stream_data_handler *, exp_data_handlers);
+    lwp_list (struct lwp_stream_data_hook *, exp_data_hooks);
 
 
     struct lwp_stream_queued
@@ -171,13 +170,13 @@ struct lw_stream
 void lwp_stream_init (lw_stream, const lw_stream_def * def, lw_pump);
 
 
-/* Calls any data handlers, then pushes the data forward */
+/* Calls any data hooks, then pushes the data forward */
 
  void lwp_stream_data (lw_stream, const char * buffer, size_t size);
 
 
 /* Returns true if this stream should be considered transparent, based on
- * whether the public IsTransparent returns true, no data handlers are
+ * whether the public IsTransparent returns true, no data hooks are
  * registered, and the queue is empty.
  */
 

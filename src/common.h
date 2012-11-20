@@ -100,7 +100,14 @@ void lwp_init ();
 #include <ctype.h>
 #include <time.h>
 
+#ifndef container_of
+   #define container_of(p, type, v) \
+        ((type *)  (((char *) p) - offsetof(type, v)) )
+        
+#endif
+
 #include "list.h"
+#include "heapbuffer.h"
 
 #include "../deps/uthash/uthash.h"
 #include "nvhash.h"
@@ -147,6 +154,8 @@ lw_bool lwp_find_char (const char ** str, size_t * len, char c);
 
 ssize_t lwp_format (char ** output, const char * format, va_list args);
 
+void lwp_to_lowercase (char * str);
+
 extern const char * const lwp_weekdays [];
 extern const char * const lwp_months [];
 
@@ -155,14 +164,14 @@ time_t lwp_parse_time (const char *);
 #ifdef __cplusplus
     } /* extern "C" */
 
-   using namespace Lacewing;
+   using namespace lacewing;
 
    #include <new> 
 
    #include "list-cxx.h"
 
    int lwp_create_server_socket
-      (Lacewing::Filter &, int Type, int Protocol, Lacewing::Error &Error);
+      (filter, int type, int protocol, error);
 
 #endif
 
@@ -178,4 +187,10 @@ time_t lwp_parse_time (const char *);
       ((real_class *) _flat)->on##handler_upper                               \
          ((real_class::Handler##handler_upper) _handler);                     \
    }                                                                          \
+
+#define lw_def_hook(c, hook) \
+    void lw_##c##_on_##hook (lw_##c ctx, lw_##c##_hook_##hook hook)           \
+    {   ctx->on_##hook = hook;                                                \
+    }                                                                         \
+
 

@@ -1,5 +1,5 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
  * Copyright (C) 2011, 2012 James McLaughlin et al.  All rights reserved.
  *
@@ -217,16 +217,19 @@ const char * const mime_types [] =
 
 const char * lw_guess_mime_type (const char * filename)
 {
+    const char * extension;
+    const char * const * i;
+
     if (*filename)
     {
-        const char * extension = strrchr (filename, '.');
+        extension = strrchr (filename, '.');
 
         if (!extension)
             extension = filename;
         else
             ++ extension;
 
-        for(const char * const * i = mime_types; *i; i += 2)
+        for(i = mime_types; *i; i += 2)
             if(!strcasecmp (*i, extension))
                 return *++ i;
     }

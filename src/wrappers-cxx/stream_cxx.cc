@@ -27,6 +27,7 @@
  * SUCH DAMAGE.
  */
 
+#define _lacewing_wrap_cxx
 #include "../common.h"
 
 Stream * Stream::New ()

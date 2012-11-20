@@ -1,7 +1,7 @@
 
-/* vim: set et ts=4 sw=4 ft=cpp:
+/* vim: set et ts=3 sw=3 ft=c:
  *
- * Copyright (C) 2012 James McLaughlin.  All rights reserved.
+ * Copyright (C) 2012 James McLaughlin et al.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,16 +27,49 @@
  * SUCH DAMAGE.
  */
 
-#include "../common.h"
+typedef struct lwp_ws_multipart
+{
+   lw_ws ws;
+   lw_ws_req request;
 
-lw_stream lw_file_new (lw_pump pump)
-    { return (lw_stream) new File (*(Pump *) pump);
-    }
-lw_stream lw_file_new_open (lw_pump pump, const char * filename, const char * mode)
-    { return (lw_stream) new File (*(Pump *) pump, filename, mode);
-    }
-lw_bool lw_file_open (lw_stream file, const char * filename, const char * mode)
-    { return ((File *) file)->Open (filename, mode);
-    }
+   struct lwp_ws_multipart * parent, * child;
+
+   multipart_parser * parser;
+
+   bool done;
+
+   lwp_nvhash disposition;
+
+   bool parsing_headers;
+
+   const char * cur_header_name;
+   size_t cur_header_name_length;
+
+   lwp_list (lw_ws_upload_hdr, headers);
+
+   lw_ws_upload cur_upload;
+
+   lw_ws_upload * uploads;
+   int num_uploads;
+
+} * lwp_ws_multipart;
+
+lwp_ws_multipart lwp_ws_multipart_new
+    (lw_ws, lw_ws_req, const char * content_type);
+
+void lwp_ws_multipart_delete (lwp_ws_multipart);
+
+size_t lwp_ws_multipart_process
+    (lwp_ws_multipart, const char * buffer, size_t size);
+
+void lwp_ws_multipart_try_hook (lwp_ws_multipart);
+
+/*inline void AddUpload (Webserver::Upload * upload)
+  {
+  Uploads = (Webserver::Upload **)
+  realloc (Uploads, sizeof (Webserver::Upload *) * (++ NumUploads));
+
+  Uploads [NumUploads - 1] = upload;
+  }*/
 
 

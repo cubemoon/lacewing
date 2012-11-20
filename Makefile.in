@@ -45,43 +45,43 @@ build/nvhash.o: src/nvhash.c $(COMMONDEPS)
 	$(CC) $(CFLAGS) -c -o $@ src/nvhash.c
 build/util.o: src/util.c $(COMMONDEPS) 
 	$(CC) $(CFLAGS) -c -o $@ src/util.c
-build/filter.o: src/filter.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/filter.cc
-build/address.o: src/address.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/address.cc
+build/filter.o: src/filter.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/filter.c
+build/address.o: src/address.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/address.c
 build/stream.o: src/stream.c $(COMMONDEPS)
 	$(CC) $(CFLAGS) -c -o $@ src/stream.c
 build/streamgraph.o: src/streamgraph.c $(COMMONDEPS)
 	$(CC) $(CFLAGS) -c -o $@ src/streamgraph.c
 build/pipe.o: src/pipe.c $(COMMONDEPS)
 	$(CC) $(CFLAGS) -c -o $@ src/pipe.c
-build/pump.o: src/pump.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/pump.cc
-build/error.o: src/error.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/error.cc
-build/webserver.o: src/webserver/webserver.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/webserver/webserver.cc
-build/request.o: src/webserver/request.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/webserver/request.cc
-build/sessions.o: src/webserver/sessions.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/webserver/sessions.cc
-build/mimetypes.o: src/webserver/mimetypes.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/webserver/mimetypes.cc
-build/multipart.o: src/webserver/multipart.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/webserver/multipart.cc
-build/http.o: src/webserver/http/http.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/webserver/http/http.cc
-build/spdy.o: src/webserver/spdy/spdy.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/webserver/spdy/spdy.cc
+build/error.o: src/error.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/error.c
+build/webserver.o: src/webserver/webserver.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/webserver/webserver.c
+build/request.o: src/webserver/request.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/webserver/request.c
+build/upload.o: src/webserver/upload.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/webserver/upload.c
+build/sessions.o: src/webserver/sessions.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/webserver/sessions.c
+build/mimetypes.o: src/webserver/mimetypes.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/webserver/mimetypes.c
+build/multipart.o: src/webserver/multipart.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/webserver/multipart.c
+build/http.o: src/webserver/http/http.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/webserver/http/http.c
+build/spdy.o: src/webserver/spdy/spdy.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/webserver/spdy/spdy.c
 build/http-parser.o: deps/http-parser/http_parser.c deps/http-parser/http_parser.h
 	$(CC) $(CFLAGS) -c -o $@ deps/http-parser/http_parser.c
 build/multipart_parser.o: deps/multipart-parser/multipart_parser.c deps/multipart-parser/multipart_parser.h
 	$(CC) $(CFLAGS) -c -o $@ deps/multipart-parser/multipart_parser.c
 build/flashpolicy.o: src/flashpolicy.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/flashpolicy.cc
+build/pump.o: src/pump.cc $(COMMONDEPS)
+	$(CXX) $(CXXFLAGS) -c -o $@ src/pump.cc
 
-build/addr_flat.o: src/wrappers-c/addr_flat.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/addr_flat.cc
 build/pump_flat.o: src/wrappers-c/pump_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/pump_flat.cc
 build/eventpump_flat.o: src/wrappers-c/eventpump_flat.cc $(COMMONDEPS)
@@ -90,27 +90,17 @@ build/server_flat.o: src/wrappers-c/server_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/server_flat.cc
 build/timer_flat.o: src/wrappers-c/timer_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/timer_flat.cc
-build/webserver_flat.o: src/wrappers-c/webserver_flat.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/webserver_flat.cc
-build/filter_flat.o: src/wrappers-c/filter_flat.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/filter_flat.cc
 build/udp_flat.o: src/wrappers-c/udp_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/udp_flat.cc
-build/client_flat.o: src/wrappers-c/client_flat.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/client_flat.cc
-build/error_flat.o: src/wrappers-c/error_flat.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/error_flat.cc
 build/sync_flat.o: src/wrappers-c/sync_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/sync_flat.cc
 build/thread_flat.o: src/wrappers-c/thread_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/thread_flat.cc
 build/flashpolicy_flat.o: src/wrappers-c/flashpolicy_flat.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/flashpolicy_flat.cc
-build/file_flat.o: src/wrappers-c/file_flat.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/wrappers-c/file_flat.cc
 
-build/openssl-sslclient.o: src/openssl/sslclient.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/openssl/sslclient.cc
+build/openssl-sslclient.o: src/openssl/sslclient.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/openssl/sslclient.c
 
 build/unix-event.o: src/unix/event.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/event.cc
@@ -124,16 +114,16 @@ build/unix-udp.o: src/unix/udp.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/udp.cc
 build/unix-thread.o: src/unix/thread.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/thread.cc
-build/unix-client.o: src/unix/client.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/client.cc
+build/unix-sync.o: src/unix/sync.cc $(COMMONDEPS)
+	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/sync.cc
+build/unix-client.o: src/unix/client.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/unix/client.c
+build/unix-global.o: src/unix/global.c $(COMMONDEPS)
+	$(CC) $(CFLAGS) -c -o $@ src/unix/global.c
 build/unix-fdstream.o: src/unix/fdstream.c $(COMMONDEPS)
 	$(CC) $(CFLAGS) -c -o $@ src/unix/fdstream.c
 build/unix-file.o: src/unix/file.c $(COMMONDEPS)
 	$(CC) $(CFLAGS) -c -o $@ src/unix/file.c
-build/unix-sync.o: src/unix/sync.cc $(COMMONDEPS)
-	$(CXX) $(CXXFLAGS) -c -o $@ src/unix/sync.cc
-build/unix-global.o: src/unix/global.c $(COMMONDEPS)
-	$(CC) $(CFLAGS) -c -o $@ src/unix/global.c
 
 build/windows-event.o: src/windows/event.cc $(COMMONDEPS)
 	$(CXX) $(CXXFLAGS) -c -o $@ src/windows/event.cc

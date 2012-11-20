@@ -28,8 +28,12 @@
  */
 
 #include "../common.h"
-#include "../openssl/sslclient.h"
-#include "../address.h"
+
+extern "C"
+{
+    #include "../openssl/sslclient.h"
+    #include "../address.h"
+}
 
 static void onClientClose (Stream &, void * tag);
 static void onClientData (Stream &, void * tag, const char * buffer, size_t size);
@@ -104,17 +108,8 @@ struct Server::Client::Internal
 
         if (Server.Context)
         {
-            /* TODO : negates the std::nothrow when accepting a client */
-
-            SSL = new SSLClient (Server.Context);
-
-            SSL->tag = this;
-            SSL->onHandshook = onSSLHandshook;
-            
-            Public.AddFilterDownstream (SSL->Downstream, false, true);
-            Public.AddFilterUpstream (SSL->Upstream, false, true);
-
-            lwp_trace ("SSL filters added");
+            SSL = lwp_sslclient_new
+                (Server.Context, (lw_stream) &Public, onSSLHandshook, this);
         }
         else
         {   SSL = 0;
@@ -137,19 +132,13 @@ struct Server::Client::Internal
             Server.Clients.Erase (Element);
         }
 
-        if (SSL)
-        {
-            if (SSL->Pumping)
-                SSL->Dead = true;
-            else
-                delete SSL;
-        }
+        lwp_sslclient_delete (SSL);
     }
 
     int UserCount;
     bool Dead;
 
-    SSLClient * SSL;
+    lwp_sslclient SSL;
 
     AddressWrapper Address;
 
@@ -158,14 +147,14 @@ struct Server::Client::Internal
     int FD;
     void * GoneKey;
 
-    static void onSSLHandshook (SSLClient &ssl_client)
+    static void onSSLHandshook (lwp_sslclient ssl, void * tag)
     {
-        Internal &client = *(Internal *) ssl_client.tag;
+        Internal &client = *(Internal *) tag;
         Server::Internal &server = client.Server;
 
         #ifdef LacewingNPN
             lwp_trace ("onSSLHandshook for %p, NPN is %s",
-                            &client, ssl_client.NPN);
+                            &client, lwp_sslclient_npn (ssl));
         #endif
 
         assert (!client.Element);
@@ -501,7 +490,7 @@ const char * Server::Client::NPN ()
     #else
 
         if (internal->SSL)
-            return (const char *) internal->SSL->NPN;
+            return lwp_sslclient_npn (internal->SSL);
 
         return "";
 
@@ -530,7 +519,7 @@ void onClientData (Stream &stream, void * tag, const char * buffer, size_t size)
     Server::Client::Internal * client = (Server::Client::Internal *) tag;
     Server::Internal &server = client->Server;
 
-    assert ( (!client->SSL) || client->SSL->Handshook );
+    assert ( (!client->SSL) || lwp_sslclient_handshook (client->SSL) );
     assert (server.Handlers.Receive);
 
     server.Handlers.Receive (server.Server, client->Public, buffer, size);
